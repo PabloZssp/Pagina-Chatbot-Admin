@@ -1,15 +1,20 @@
 import streamlit as st
 import pandas as pd
+import Herramientas as h  # Módulo de herramientas para links de las páginas
 
 
 def BasesDatos():
-    st.set_page_config(page_title="Bases de Datos", initial_sidebar_state="collapsed")
+    
+    h.MenuPrincipal()
+    st.set_page_config(page_title="Bases de Datos", initial_sidebar_state="auto")
     
     st.title("Bases de Datos")
     st.sidebar.header("Opciones")
     
     # Aquí puedes agregar más opciones en la barra lateral si es necesario
-    st.sidebar.button("Cargar datos")
+    st.button("")
+    st.sidebar.button("Guardar datos")
+    st.sidebar.button("Actualizar datos")
     
     # Crear un DataFrame de ejemplo
     data = {
@@ -23,5 +28,6 @@ def BasesDatos():
     st.write("Aquí hay un DataFrame de ejemplo:")
     st.dataframe(df)
 
-
-
+if __name__ == "__main__":
+    BasesDatos()
+    st.sidebar.button("Salir")
