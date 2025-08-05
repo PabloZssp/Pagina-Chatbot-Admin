@@ -4,7 +4,7 @@ def MenuPrincipal():
     
     with st.sidebar:
          st.page_link("Pagina_Principal.py",label="Pagina Principal",icon="🤖")
-         st.page_link("pages/Bases_Datos.py",label="Formularios",icon="💬")
+         st.page_link("pages/Formularios.py",label="Formularios",icon="💬")
          st.page_link("pages/Chatbot.py",label="Graficas",icon="📊")
 
 
@@ -16,14 +16,14 @@ def MenuPrincipal():
 page_bg_img = """
 <style>
 [data-testid="stAppViewContainer"] {
-    background-image: url("https://th.bing.com/th/id/R.7d7f4351c51dd1200bdea57735c8e25b?rik=Ct6%2bBPXenE4VQw&riu=http%3a%2f%2fgetwallpapers.com%2fwallpaper%2ffull%2fa%2f9%2f8%2f451587.jpg&ehk=5dyceC%2fQupl%2bHpSVz%2bmzhbjja%2fqhzC90tPKDisWow%2bk%3d&risl=&pid=ImgRaw&r=0");
+    background-color: rgba(160, 19, 40, 0.5);
     background-size: cover;
 }
 
 
 
 [data-testid="stHeader"] {
-    background-color: rgba(0, 0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.5);
 
 }
 
