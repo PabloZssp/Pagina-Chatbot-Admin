@@ -8,9 +8,9 @@
 # Despues veremos de que manera implemetar mas cosas
 import streamlit as st
 import Herramientas as h #modulo de herramientas para links de las paginas
-import time
+
 col_1,col_2=st.columns(2)
-st.set_page_config(page_title="Pagina principal", initial_sidebar_state="auto",page_icon="🤖", layout="wide")
+st.set_page_config(page_title="Pagina principal", initial_sidebar_state="auto",page_icon="🤖", layout="centered")
 
 st.header("CHATBOT ADMIN")
 

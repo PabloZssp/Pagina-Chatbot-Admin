@@ -6,16 +6,15 @@ import Herramientas as h  # Módulo de herramientas para links de las páginas
 def BasesDatos():
     
     h.MenuPrincipal()
-    st.set_page_config(page_title="Formularios", initial_sidebar_state="auto",page_icon="💬")
+    st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬")
     
-    st.title("Formularios")
-    st.sidebar.header("MENU")
+    st.title("Componetes")    
+ 
     
     # Aquí puedes agregar más opciones en la barra lateral si es necesario
-    st.sidebar.button("Base de datos")
-    st.sidebar.button("Markdown")
 
-    Menu = ["","Base de datos", "Markdown"]
+
+    Menu = ["Base de datos", "Markdown"]
     
     
 
@@ -39,33 +38,130 @@ def BasesDatos():
     
 # Esta la usaremos para modificar las opciones de los formularios
 def opciones(entrada):
-    Menu_Sec = ["","Crear", "Modificar", "Leer", "Eliminar"]
+    Menu_Sec = ["Leer", "Modificar","Crear" , "Eliminar"]
     st.subheader(f"Formulario {entrada}")
     opcion = st.selectbox("Selecciona una opción", options=Menu_Sec, index=0)
 
     if opcion == "Crear":
-        crear()
+        crear(entrada)
     elif opcion == "Modificar":
-        modificar()
+        modificar(entrada)
     elif opcion == "Leer":
-        leer()
+        leer(entrada)
     elif opcion == "Eliminar":
-        eliminar()
+        eliminar(entrada)
 
 
-def crear():
+def crear(entrada):
+
+    Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
     st.subheader("Crear un nuevo registro")
-    # Aquí puedes agregar el formulario para crear un nuevo registro
+    col1, col2, col3, col4 = st.columns(4)
+    if entrada == "Base de datos":
+        
+       
+        with col1:
+            st.subheader("**Tabla:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Titulo:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Recinto:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Dirección:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Mes:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Fechas:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+                        
+           
+
+        with col2:
+            st.selectbox("", options=[" ","Eventos", "Actividades", "Cursos", "Talleres"], index=0)  # Nombre de la tabla
+            title_text = st.text_input(" ")
+            building_name_text = st.text_input("   ")
+            address_text = st.text_input("    ")
+            month_text = st.selectbox("", options=Opt_M, index=0)       
+            dates_text = st.text_input("      ", placeholder="YYYY/MM/DD ")
+            
+
+        with col3:
+            st.subheader("**Hora:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Duración:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Categoría:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Costo:**") 
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**URL:**")
     
-def modificar():
+        with col4:
+            hora_text = st.text_input("         ")
+            duracion_text = st.text_input("                 ")
+            category_text = st.text_input("          ")
+            cost_text = st.text_input("              ")
+            url = st.text_input("            ")
+
+
+        st.subheader("**Descripción:**")
+        description_text = st.text_area(" ", height=300, placeholder="Escribe aquí la descripción del evento o actividad...")
+       # st.button(on_click="Guardar", label="Guardar registro", type="primary")
+
+#########################################################
+    if entrada == "Markdown":
+        with col1:
+            
+            st.subheader("**Titulo:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Recinto:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Dirección:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Mes:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Fechas:**")
+            st.markdown("<br>", unsafe_allow_html=True)  
+
+        with col2:
+            title = st.text_input(" ")
+            building_name = st.text_input("   ")
+            address = st.text_input("    ")
+            month = st.selectbox("", options=Opt_M, index=0)       
+            dates = st.text_input("      ", placeholder="YYYY/MM/DD ")
+            
+
+        with col3:
+            st.subheader("**Hora:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            st.subheader("**Categoría:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**Costo:**") 
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.subheader("**URL:**")
+    
+        with col4:
+            hour = st.text_input("         ")
+            category = st.text_input("          ")
+            cost = st.text_input("              ")
+            url = st.text_input("            ")
+
+
+        st.subheader("**Descripción:**")
+        description = st.text_area(" ", height=300, placeholder="Escribe aquí la descripción del evento o actividad...")
+       # st.button(on_click="Guardar", label="Guardar registro", type="primary")
+        
+def modificar(entrada):
     st.subheader("Modificar un registro existente")
     # Aquí puedes agregar el formulario para modificar un registro existente
 
-def leer():
+def leer(entrdada):
     st.subheader("Leer registros")
     # Aquí puedes agregar el código para leer registros de la base de datos 
 
-def eliminar():
+def eliminar(entrada):
     st.subheader("Eliminar un registro existente")
     # Aquí puedes agregar el formulario para eliminar un registro existente
 

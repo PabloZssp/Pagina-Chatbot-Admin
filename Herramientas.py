@@ -1,10 +1,12 @@
 import streamlit as st
 
+
+
 def MenuPrincipal():
     
     with st.sidebar:
          st.page_link("Pagina_Principal.py",label="Pagina Principal",icon="🤖")
-         st.page_link("pages/Formularios.py",label="Formularios",icon="💬")
+         st.page_link("pages/Formularios.py",label="Componetes",icon="📝")
          st.page_link("pages/Chatbot.py",label="Graficas",icon="📊")
 
 
@@ -16,20 +18,20 @@ def MenuPrincipal():
 page_bg_img = """
 <style>
 [data-testid="stAppViewContainer"] {
-    background-color: rgba(160, 19, 40, 0.5);
+    background-color: rgba(159, 34, 65, 0.5);
     background-size: cover;
 }
 
 
 
 [data-testid="stHeader"] {
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(188, 149, 92, 0.2);
 
 }
 
 
 [data-testid="stSidebar"] {
-    background-image: url("https://tse2.mm.bing.net/th/id/OIP.Ba2JQ6Cmz07WXLAliKvM-QHaEo?pid=ImgDet&w=474&h=296&rs=1&o=7&rm=3");
+    background-color: rgba(44, 45, 50);
     background-size: cover;
 }
 </style>
