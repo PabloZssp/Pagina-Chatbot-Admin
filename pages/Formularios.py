@@ -1,6 +1,13 @@
 import streamlit as st
 import pandas as pd
 import Herramientas as h  # Módulo de herramientas para links de las páginas
+import sqlmodel as sql
+import BD2   # Importa el módulo BD.py para acceder a las clases de eventos
+
+
+
+
+
 
 
 def BasesDatos():
@@ -51,31 +58,33 @@ def opciones(entrada):
     elif opcion == "Eliminar":
         eliminar(entrada)
 
-
+@st.dialog("Crear",width="large")
 def crear(entrada):
 
     Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
     st.subheader("Crear un nuevo registro")
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4 = st.columns([2,3,2,3])
     if entrada == "Base de datos":
-        
-       
+        st.dialog("inserte los campos")
         with col1:
+            st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Tabla:**")
             st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Titulo:**")
+            st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Recinto:**")
             st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Dirección:**")
             st.markdown("<br>", unsafe_allow_html=True)
+            
             st.subheader("**Mes:**")
             st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Fechas:**")
             st.markdown("<br>", unsafe_allow_html=True)
                         
-           
+        
 
         with col2:
             st.selectbox("", options=[" ","Eventos", "Actividades", "Cursos", "Talleres"], index=0)  # Nombre de la tabla
@@ -87,9 +96,11 @@ def crear(entrada):
             
 
         with col3:
+            st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Hora:**")
             st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Duración:**")
+            st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Categoría:**")
             st.markdown("<br>", unsafe_allow_html=True)
@@ -107,17 +118,24 @@ def crear(entrada):
 
         st.subheader("**Descripción:**")
         description_text = st.text_area(" ", height=300, placeholder="Escribe aquí la descripción del evento o actividad...")
-       # st.button(on_click="Guardar", label="Guardar registro", type="primary")
+        
+
+        
+
+            # Aquí puedes agregar el código para guardar el registro en la base de datos
+           
+
 
 #########################################################
     if entrada == "Markdown":
         with col1:
-            
+            st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Titulo:**")
             st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Recinto:**")
             st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Dirección:**")
+            st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
             st.subheader("**Mes:**")
             st.markdown("<br>", unsafe_allow_html=True)
@@ -133,6 +151,7 @@ def crear(entrada):
             
 
         with col3:
+            st.markdown("<br>", unsafe_allow_html=True) 
             st.subheader("**Hora:**")
             st.markdown("<br>", unsafe_allow_html=True)
             
@@ -157,15 +176,53 @@ def modificar(entrada):
     st.subheader("Modificar un registro existente")
     # Aquí puedes agregar el formulario para modificar un registro existente
 
+
+
+def selec_comp(Select):
+    if Select == "Eventos":
+        eventos = {
+            "Título": ["Concierto de Jazz", "Feria del Libro"],
+            "Recinto": ["Teatro Metropolitano", "Centro Cultural"],
+            "Dirección": ["Av. Reforma 123", "Calle Juárez 45"],
+            "Mes": ["Agosto", "Septiembre"],
+            "Fechas": ["10-12 Ago", "5-9 Sep"],
+            "Hora": ["19:00", "10:00"],
+            "Duración": ["2 horas", "5 días"],
+            "Categorías": ["Música", "Literatura"],
+            "Costo": ["$200", "Entrada libre"],
+            "URL": ["https://ejemplo.com/jazz", "https://ejemplo.com/libro"]
+        }
+        df_eventos = pd.DataFrame(eventos)
+        # Mostrar tabla
+        st.table(df_eventos)
+        st.markdown(h.tabla_Format,unsafe_allow_html=True)
+        
+#@st.dialog("Leer")
 def leer(entrdada):
     st.subheader("Leer registros")
-    # Aquí puedes agregar el código para leer registros de la base de datos 
-
+    Menu_tabla = ["Eventos", "Actividades", "Cursos", "Talleres"]
+    elec = st.selectbox(" Componente a ver: " ,options=Menu_tabla, index=0 )
+    selec_comp(elec)
+    # Datos de ejemplo
+    
+@st.dialog("Eliminar")
 def eliminar(entrada):
     st.subheader("Eliminar un registro existente")
-    # Aquí puedes agregar el formulario para eliminar un registro existente
+     
+    Menu_Elim = [" ","Campo 1", "Campo 2", "Campo 3"]
+    Menu_tabla = ["Eventos", "Actividades", "Cursos", "Talleres"]
 
+    if entrada == "Base de datos":
 
+        opcion_elim = st.selectbox("Selecciona Tabla", options=Menu_tabla, index=0)
+        opcion_elim_campo= st.selectbox("Selecciona Campo", options=Menu_Elim, index=0)
+        
+        Elim_B = st.button("Eliminar registro", type="primary")
+
+        if Elim_B:
+           st.success(f"Registro eliminado de la tabla {opcion_elim} en el campo {opcion_elim_campo}")
+    if entrada == "Markdown":
+        opcion_elim= st.selectbox("Selecciona el Markdown", options= Menu_Elim, index = 0)
 
 
 BasesDatos()
