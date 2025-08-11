@@ -196,6 +196,7 @@ def selec_comp(Select):
         # Mostrar tabla
         st.table(df_eventos)
         st.markdown(h.tabla_Format,unsafe_allow_html=True)
+    
         
 #@st.dialog("Leer")
 def leer(entrdada):
