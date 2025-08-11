@@ -1,8 +1,9 @@
+
 import streamlit as st
 import pandas as pd
 import Herramientas as h  # Módulo de herramientas para links de las páginas
 import sqlmodel as sql
-import BD2   # Importa el módulo BD.py para acceder a las clases de eventos
+#import BD2   # Importa el módulo BD.py para acceder a las clases de eventos
 import Conexion as cnx
 
 
@@ -351,3 +352,5 @@ def eliminar(entrada):
 
 
 BasesDatos()
+
+
