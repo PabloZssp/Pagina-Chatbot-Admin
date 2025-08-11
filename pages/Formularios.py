@@ -3,7 +3,7 @@ import pandas as pd
 import Herramientas as h  # Módulo de herramientas para links de las páginas
 import sqlmodel as sql
 import BD2   # Importa el módulo BD.py para acceder a las clases de eventos
-
+import Conexion as cnx
 
 
 
@@ -42,19 +42,41 @@ def BasesDatos():
 
     
     st.markdown(h.page_bg_img, unsafe_allow_html=True)
-    
+
+def crear_tabla_eventos():
+    conn = cnx.get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS Eventos (
+            id SERIAL PRIMARY KEY,
+            titulo TEXT,
+            recinto TEXT,
+            direccion TEXT,
+            mes TEXT,
+            fechas TEXT,
+            hora TEXT,
+            duracion TEXT,
+            categoria TEXT,
+            costo TEXT,
+            url TEXT,
+            descripcion TEXT
+        )
+    """)
+    conn.commit()
+    cur.close()    
+
+
 # Esta la usaremos para modificar las opciones de los formularios
 def opciones(entrada):
-    Menu_Sec = ["Leer", "Modificar","Crear" , "Eliminar"]
+    Menu_Sec = ["Leer","Crear" , "Eliminar"]
     st.subheader(f"Formulario {entrada}")
     opcion = st.selectbox("Selecciona una opción", options=Menu_Sec, index=0)
 
     if opcion == "Crear":
         crear(entrada)
-    elif opcion == "Modificar":
-        modificar(entrada)
     elif opcion == "Leer":
         leer(entrada)
+        
     elif opcion == "Eliminar":
         eliminar(entrada)
 
@@ -62,6 +84,7 @@ def opciones(entrada):
 def crear(entrada):
 
     Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+    crear_tabla_eventos()
 
     st.subheader("Crear un nuevo registro")
     col1, col2, col3, col4 = st.columns([2,3,2,3])
@@ -119,6 +142,24 @@ def crear(entrada):
         st.subheader("**Descripción:**")
         description_text = st.text_area(" ", height=300, placeholder="Escribe aquí la descripción del evento o actividad...")
         
+        if st.button("Guardar registro"):
+            try:
+                conn = cnx.get_connection()
+                cur = conn.cursor()
+                cur.execute("""
+                    INSERT INTO Eventos (
+                        titulo, recinto, direccion, mes, fechas, hora, duracion, categoria, costo, url, descripcion
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    title_text, building_name_text, address_text, month_text, dates_text,
+                    hora_text, duracion_text, category_text, cost_text, url, description_text
+                ))
+                conn.commit()
+                cur.close()
+                st.success("Registro guardado exitosamente")
+            except Exception as e:
+                st.error(f" Error al guardar el registro: {e}")
+
 
         
 
@@ -180,22 +221,74 @@ def modificar(entrada):
 
 def selec_comp(Select):
     if Select == "Eventos":
-        eventos = {
-            "Título": ["Concierto de Jazz", "Feria del Libro"],
-            "Recinto": ["Teatro Metropolitano", "Centro Cultural"],
-            "Dirección": ["Av. Reforma 123", "Calle Juárez 45"],
-            "Mes": ["Agosto", "Septiembre"],
-            "Fechas": ["10-12 Ago", "5-9 Sep"],
-            "Hora": ["19:00", "10:00"],
-            "Duración": ["2 horas", "5 días"],
-            "Categorías": ["Música", "Literatura"],
-            "Costo": ["$200", "Entrada libre"],
-            "URL": ["https://ejemplo.com/jazz", "https://ejemplo.com/libro"]
+        eventos = cnx.obtener_eventos()
+
+        if eventos:
+            df_eventos = pd.DataFrame(eventos, columns=[
+                "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
+                "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
+            ])
+            st.subheader(" Registros guardados")
+            st.dataframe(df_eventos)
+            st.markdown(h.tabla_Format,unsafe_allow_html=True)
+
+
+
+    if Select == "Actividades" :
+        actividades = {
+            "Título": ["Yoga al aire libre", "Caminata ecológica"],
+            "Recinto": ["Parque México", "Bosque de Chapultepec"],
+            "Dirección": ["Av. México s/n", "Av. Chapultepec 200"],
+            "Mes": ["Agosto", "Agosto"],
+            "Fechas": ["15 Ago", "22 Ago"],
+            "Hora": ["08:00", "09:00"],
+            "Duración": ["1 hora", "2 horas"],
+            "Categorías": ["Salud", "Medio ambiente"],
+            "Costo": ["Gratis", "Gratis"],
+            "URL": ["https://ejemplo.com/yoga", "https://ejemplo.com/caminata"]
         }
-        df_eventos = pd.DataFrame(eventos)
+        df_actividades = pd.DataFrame(actividades)
         # Mostrar tabla
-        st.table(df_eventos)
+        st.table(df_actividades)
         st.markdown(h.tabla_Format,unsafe_allow_html=True)
+    if Select== "Cursos":
+
+        cursos = {
+        "Título": ["Curso de Fotografía", "Curso de Programación"],
+            "Recinto": ["Casa de Cultura", "Centro Digital"],
+            "Dirección": ["Calle Arte 22", "Av. Tecnología 101"],
+            "Mes": ["Septiembre", "Octubre"],
+            "Fechas": ["1-15 Sep", "5-30 Oct"],
+            "Hora": ["17:00", "18:00"],
+            "Duración": ["2 semanas", "1 mes"],
+            "Categorías": ["Arte", "Tecnología"],
+            "Costo": ["$500", "$800"],
+            "URL": ["https://ejemplo.com/foto", "https://ejemplo.com/programacion"]
+        }
+
+        df_cursos = pd.DataFrame(cursos)
+        # Mostrar tabla
+        st.table(df_cursos)
+        st.markdown(h.tabla_Format,unsafe_allow_html=True)
+    if Select == "Talleres":
+        talleres = {
+            "Título": ["Taller de Cerámica", "Taller de Escritura Creativa"],
+            "Recinto": ["Centro Artesanal", "Biblioteca Central"],
+            "Dirección": ["Av. Creativa 88", "Calle Letras 33"],
+            "Mes": ["Octubre", "Noviembre"],
+            "Fechas": ["3-7 Oct", "10-14 Nov"],
+            "Hora": ["15:00", "16:00"],
+            "Duración": ["5 días", "5 días"],
+            "Categorías": ["Manualidades", "Literatura"],
+            "Costo": ["$300", "Entrada libre"],
+            "URL": ["https://ejemplo.com/ceramica", "https://ejemplo.com/escritura"]
+        }
+
+        df_talleres = pd.DataFrame(talleres)
+        # Mostrar tabla
+        st.table(df_talleres)
+        st.markdown(h.tabla_Format,unsafe_allow_html=True)
+
     
         
 #@st.dialog("Leer")
@@ -204,24 +297,55 @@ def leer(entrdada):
     Menu_tabla = ["Eventos", "Actividades", "Cursos", "Talleres"]
     elec = st.selectbox(" Componente a ver: " ,options=Menu_tabla, index=0 )
     selec_comp(elec)
-    # Datos de ejemplo
+    edit_b = st.button("Editar")
+    if edit_b:
+        try:
+         cnx.editar_campo(elec)
+        except Exception as e:
+            st.error(f"Ocurrió un error al eliminar el evento: {e}")
+
+
     
-@st.dialog("Eliminar")
+@st.dialog("Eliminar",width="large")
 def eliminar(entrada):
     st.subheader("Eliminar un registro existente")
      
     Menu_Elim = [" ","Campo 1", "Campo 2", "Campo 3"]
-    Menu_tabla = ["Eventos", "Actividades", "Cursos", "Talleres"]
+    Menu_tabla = [" ","Eventos", "Actividades", "Cursos", "Talleres"]
 
     if entrada == "Base de datos":
 
         opcion_elim = st.selectbox("Selecciona Tabla", options=Menu_tabla, index=0)
-        opcion_elim_campo= st.selectbox("Selecciona Campo", options=Menu_Elim, index=0)
         
-        Elim_B = st.button("Eliminar registro", type="primary")
+        if opcion_elim == "Eventos":   
+             opcion_elim_campo= st.selectbox("Selecciona Campo", options=Menu_Elim, index=0)
+             Elim_BE = st.button("Eliminar registro", type="primary",key="Eliminar Eventos")
+             if Elim_BE:
+              st.success(f"Registro eliminado de la tabla {opcion_elim} en el campo {opcion_elim_campo}")        
 
-        if Elim_B:
-           st.success(f"Registro eliminado de la tabla {opcion_elim} en el campo {opcion_elim_campo}")
+        elif opcion_elim == "Actividades":
+             opcion_elim_campo= st.selectbox("Selecciona Campo", options=Menu_Elim, index=0)       
+             Elim_BA = st.button("Eliminar registro", type="primary", key= "Eliminar actividades")
+             if Elim_BA:
+                st.success(f"Registro eliminado de la tabla {opcion_elim} en el campo {opcion_elim_campo}")
+
+        elif opcion_elim == "Cursos":
+             opcion_elim_campo= st.selectbox("Selecciona Campo", options=Menu_Elim, index=0)                    
+             Elim_BC = st.button("Eliminar registro", type="primary", key = "Eliminar Cursos")
+             if Elim_BC:
+                st.success(f"Registro eliminado de la tabla {opcion_elim} en el campo {opcion_elim_campo}")
+
+        elif opcion_elim == "Talleres":
+            opcion_elim_campo= st.selectbox("Selecciona Campo", options=Menu_Elim, index=0)
+                    
+            Elim_BT = st.button("Eliminar registro", type="primary", key = "Eliminar Talleres")
+
+            if Elim_BT:
+                st.success(f"Registro eliminado de la tabla {opcion_elim} en el campo {opcion_elim_campo}")
+
+
+        
+
     if entrada == "Markdown":
         opcion_elim= st.selectbox("Selecciona el Markdown", options= Menu_Elim, index = 0)
 
