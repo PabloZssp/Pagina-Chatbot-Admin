@@ -7,10 +7,6 @@ import sqlmodel as sql
 import Conexion as cnx
 
 
-
-
-
-
 def BasesDatos():
     
     h.MenuPrincipal()
@@ -76,7 +72,7 @@ def opciones(entrada):
     if opcion == "Crear":
         crear(entrada)
     elif opcion == "Leer":
-        leer(entrada)
+        leer()
         
     elif opcion == "Eliminar":
         eliminar(entrada)
@@ -86,6 +82,10 @@ def crear(entrada):
 
     Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
     crear_tabla_eventos()
+    cnx.crear_tabla_Actividades()
+    cnx.crear_tabla_Cursos()
+    cnx.crear_tabla_Talleres()
+
 
     st.subheader("Crear un nuevo registro")
     col1, col2, col3, col4 = st.columns([2,3,2,3])
@@ -111,7 +111,7 @@ def crear(entrada):
         
 
         with col2:
-            st.selectbox("", options=[" ","Eventos", "Actividades", "Cursos", "Talleres"], index=0)  # Nombre de la tabla
+            tabla = st.selectbox("", options=[" ","Eventos", "Actividades", "Cursos", "Talleres"], index=0)  # Nombre de la tabla
             title_text = st.text_input(" ")
             building_name_text = st.text_input("   ")
             address_text = st.text_input("    ")
@@ -148,7 +148,7 @@ def crear(entrada):
                 conn = cnx.get_connection()
                 cur = conn.cursor()
                 cur.execute("""
-                    INSERT INTO Eventos (
+                    INSERT INTO Actividades (
                         titulo, recinto, direccion, mes, fechas, hora, duracion, categoria, costo, url, descripcion
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
@@ -212,11 +212,25 @@ def crear(entrada):
 
         st.subheader("**Descripción:**")
         description = st.text_area(" ", height=300, placeholder="Escribe aquí la descripción del evento o actividad...")
-       # st.button(on_click="Guardar", label="Guardar registro", type="primary")
+        if st.button("Guardar registro"):
+                try:
+                    conn = cnx.get_connection()
+                    cur = conn.cursor()
+                    cur.execute("""
+                        INSERT INTO Eventos (
+                            titulo, recinto, direccion, mes, fechas, hora, duracion, categoria, costo, url, descripcion
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        title_text, building_name_text, address_text, month_text, dates_text,
+                        hora_text, duracion_text, category_text, cost_text, url, description_text
+                    ))
+                    conn.commit()
+                    cur.close()
+                    st.success("Registro guardado exitosamente")
+                except Exception as e:
+                    st.error(f" Error al guardar el registro: {e}")
         
-def modificar(entrada):
-    st.subheader("Modificar un registro existente")
-    # Aquí puedes agregar el formulario para modificar un registro existente
+
 
 
 
@@ -232,27 +246,19 @@ def selec_comp(Select):
             st.subheader(" Registros guardados")
             st.dataframe(df_eventos)
             st.markdown(h.tabla_Format,unsafe_allow_html=True)
+    
+    elif Select == "Actividades" :
+        actividades =cnx.obtener_Actividades()
 
+        if actividades:
+            df_activ =pd.DataFrame(actividades,columns=[
+                "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
+                "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
+            ])
+            st.header("Registros Actividades Guardados")
+            st.dataframe(df_activ)
 
-
-    if Select == "Actividades" :
-        actividades = {
-            "Título": ["Yoga al aire libre", "Caminata ecológica"],
-            "Recinto": ["Parque México", "Bosque de Chapultepec"],
-            "Dirección": ["Av. México s/n", "Av. Chapultepec 200"],
-            "Mes": ["Agosto", "Agosto"],
-            "Fechas": ["15 Ago", "22 Ago"],
-            "Hora": ["08:00", "09:00"],
-            "Duración": ["1 hora", "2 horas"],
-            "Categorías": ["Salud", "Medio ambiente"],
-            "Costo": ["Gratis", "Gratis"],
-            "URL": ["https://ejemplo.com/yoga", "https://ejemplo.com/caminata"]
-        }
-        df_actividades = pd.DataFrame(actividades)
-        # Mostrar tabla
-        st.table(df_actividades)
-        st.markdown(h.tabla_Format,unsafe_allow_html=True)
-    if Select== "Cursos":
+    elif Select== "Cursos":
 
         cursos = {
         "Título": ["Curso de Fotografía", "Curso de Programación"],
@@ -271,7 +277,7 @@ def selec_comp(Select):
         # Mostrar tabla
         st.table(df_cursos)
         st.markdown(h.tabla_Format,unsafe_allow_html=True)
-    if Select == "Talleres":
+    elif Select == "Talleres":
         talleres = {
             "Título": ["Taller de Cerámica", "Taller de Escritura Creativa"],
             "Recinto": ["Centro Artesanal", "Biblioteca Central"],
@@ -290,20 +296,63 @@ def selec_comp(Select):
         st.table(df_talleres)
         st.markdown(h.tabla_Format,unsafe_allow_html=True)
 
+
+@st.dialog("Modificar")
+def modificar():
     
+    
+    Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
+    st.write("Selecciona el campo a modificar")
+    
+    ids = cnx.editar_campo()
+    id_seleccionado = st.selectbox("Selecciona un ID", ids)
+    
+    # Aquí podrías cargar los datos del registro seleccionado
+    registro = cnx.obtener_registro_id(id_seleccionado)
+    c1,c2 = st.columns([5,5])
+    if registro:
+         with c1:
+          Titulo = st.text_input("Titulo", value=registro[0])
+          Recinto= st.text_input("Recinto", value=registro[1])
+          Direccion = st.text_input("Direccion", value =registro[2])
+          Mes = st.selectbox("Mes", options=Opt_M, index=Opt_M.index(registro[3]))
+          Fechas= st.text_input("Fechas",value=registro[4] )
+         
+         with c2:
+          Hora= st.text_input("Hora",value=registro[5])
+          Duracion = st.text_input("Duracion", value=registro[6])
+          Categoria = st.text_input("Categoria", value=registro[8])
+          Costo= st.text_input("Costo",value=registro[9])
+          Url= st.text_input("URL",value=registro[10])
+          
+         Descripcion = st.text_area("Descripción", height=300 ,  value=registro[7])
+         G_b =st.button("Guardar cambios")
+        
+    if G_b:
+            cnx.actualizar_registro(id_seleccionado, Titulo, Recinto, Direccion, Mes, Fechas, Hora, Duracion, Descripcion, Categoria, Costo, Url)
+            st.success("Registro actualizado correctamente")
+    
+
         
 #@st.dialog("Leer")
-def leer(entrdada):
+def leer():
     st.subheader("Leer registros")
+    
+    st.write("Tablas disponibles en la base de datos:")
+    diccionario_tablas = cnx.obtener_tablas()
+    tablas = st.selectbox("Selecciona una tabla", options=list(diccionario_tablas.values()))
+    
+    
     Menu_tabla = ["Eventos", "Actividades", "Cursos", "Talleres"]
     elec = st.selectbox(" Componente a ver: " ,options=Menu_tabla, index=0 )
     selec_comp(elec)
     edit_b = st.button("Editar")
     if edit_b:
         try:
-         cnx.editar_campo(elec)
+          modificar()
         except Exception as e:
-            st.error(f"Ocurrió un error al eliminar el evento: {e}")
+            st.error(f"Ocurrió un error al editar el evento: {e}")
 
 
     
@@ -319,23 +368,32 @@ def eliminar(entrada):
         opcion_elim = st.selectbox("Selecciona Tabla", options=Menu_tabla, index=0)
         
         if opcion_elim == "Eventos":   
+             eventos = cnx.obtener_eventos()
+
+             if eventos:
+                 df_eventos = pd.DataFrame(eventos, columns=[
+                     "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
+                       "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
+                   ])
+                 st.subheader(" Registros guardados")
+                 st.dataframe(df_eventos, use_container_width=True)
              opcion_elim_campo= st.selectbox("Selecciona Campo", options=Menu_Elim, index=0)
              Elim_BE = st.button("Eliminar registro", type="primary",key="Eliminar Eventos")
              if Elim_BE:
               st.success(f"Registro eliminado de la tabla {opcion_elim} en el campo {opcion_elim_campo}")        
-
+###############################################
         elif opcion_elim == "Actividades":
              opcion_elim_campo= st.selectbox("Selecciona Campo", options=Menu_Elim, index=0)       
              Elim_BA = st.button("Eliminar registro", type="primary", key= "Eliminar actividades")
              if Elim_BA:
                 st.success(f"Registro eliminado de la tabla {opcion_elim} en el campo {opcion_elim_campo}")
-
+###############################################
         elif opcion_elim == "Cursos":
              opcion_elim_campo= st.selectbox("Selecciona Campo", options=Menu_Elim, index=0)                    
              Elim_BC = st.button("Eliminar registro", type="primary", key = "Eliminar Cursos")
              if Elim_BC:
                 st.success(f"Registro eliminado de la tabla {opcion_elim} en el campo {opcion_elim_campo}")
-
+################################################
         elif opcion_elim == "Talleres":
             opcion_elim_campo= st.selectbox("Selecciona Campo", options=Menu_Elim, index=0)
                     

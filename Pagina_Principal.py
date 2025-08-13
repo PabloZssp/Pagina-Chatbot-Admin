@@ -13,14 +13,11 @@ col_1,col_2=st.columns(2)
 st.set_page_config(page_title="Pagina principal", initial_sidebar_state="auto",page_icon="🤖", layout="centered")
 
 st.header("CHATBOT ADMIN")
-
-
 st.subheader("Bienvenido al Chatbot Admin, aqui podras administrar los datos de tu chatbot")
-
 
 col_1,col_2=st.columns(2)
 with col_1:
-    bt_A = st.button("Ir a Formularios")
+    bt_A = st.button("Ir a Componetes")
 
 with col_2:
     bt_b = st.button("Ir a Graficas" )
