@@ -18,13 +18,7 @@ def get_connection():
         'postgres://avnadmin:AVNS_BVDiq3SEleEgX51PwfA@pg-106b1540-pruebaconexionfront.c.aivencloud.com:18155/defaultdb?sslmode=require'
     )
 
-def get_version():
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT VERSION()")
-    version = cur.fetchone()[0]
-    cur.close()
-    return version
+
 
 def obtener_eventos():
     conn = psycopg2.connect('postgres://avnadmin:AVNS_BVDiq3SEleEgX51PwfA@pg-106b1540-pruebaconexionfront.c.aivencloud.com:18155/defaultdb?sslmode=require')
@@ -43,6 +37,44 @@ def obtener_Actividades():
     cur.close()
     conn.close()
     return rows
+
+def obtenerCursos():
+    conn = psycopg2.connect('postgres://avnadmin:AVNS_BVDiq3SEleEgX51PwfA@pg-106b1540-pruebaconexionfront.c.aivencloud.com:18155/defaultdb?sslmode=require')
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM Cursos ORDER BY id ASC")
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return rows
+
+def obtener_Talleres():
+    conn = psycopg2.connect('postgres://avnadmin:AVNS_BVDiq3SEleEgX51PwfA@pg-106b1540-pruebaconexionfront.c.aivencloud.com:18155/defaultdb?sslmode=require')
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM Talleres ORDER BY id ASC")
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return rows
+
+def obtener_columnas(nombre_tabla):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # Usar parámetros para evitar inyecciones SQL
+    consulta = """
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME = %s;
+    """
+    cur.execute(consulta, (nombre_tabla,))
+    columnas = [row[0] for row in cur.fetchall()]
+    conn.close()
+
+    # Crear diccionario con nombres como claves y valores iguales
+    diccionario = {col: col for col in columnas}
+    return diccionario
+
+
 
 def obtener_tablas():
     conn = get_connection()
@@ -70,24 +102,28 @@ def obtener_tablas():
       #      st.subheader(" Registros guardados")
        #     st.dataframe(df_eventos, use_container_width=True)
 
-def editar_campo():
+def editar_campo(t_seleccion):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id FROM eventos ORDER BY id")
+    cur.execute(f"SELECT id FROM {t_seleccion} ORDER BY id")
     ids = [row[0] for row in cur.fetchall()]
     return ids
 
+def obtener_registro_id(id_evento, t_Select):
+    TABLAS_PERMITIDAS = ["cursos", "eventos", "actividades","talleres"]
+    if t_Select not in TABLAS_PERMITIDAS:
+        raise ValueError("Tabla no permitida")
 
-def obtener_registro_id(id_evento):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(f"""
         SELECT Titulo, Recinto, Direccion, Mes, Fechas, Hora, Duracion, Descripcion, Categoria, Costo, URL
-        FROM eventos WHERE id = %s
+        FROM {t_Select} WHERE id = %s
     """, (id_evento,))
     evento = cur.fetchone()
     conn.close()
     return evento
+
 
 def actualizar_registro(id, titulo, recinto, direccion, mes, fechas, hora, duracion, descripcion, categoria, costo, url):
     conn = get_connection()
@@ -114,6 +150,28 @@ def actualizar_registro(id, titulo, recinto, direccion, mes, fechas, hora, durac
     
     conn.commit()
     conn.close()
+
+
+
+def Crear_registro(Tabla, title_text, building_name_text, address_text, month_text, dates_text,
+                   hora_text, duracion_text, category_text, cost_text, url, description_text):
+    conn = get_connection()
+    cur = conn.cursor()
+    
+    query = f"""
+        INSERT INTO {Tabla} (
+            titulo, recinto, direccion, mes, fechas, hora, duracion, categoria, costo, url, descripcion
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    
+    cur.execute(query, (
+        title_text, building_name_text, address_text, month_text, dates_text,
+        hora_text, duracion_text, category_text, cost_text, url, description_text
+    ))
+    
+    conn.commit()
+    cur.close()
+
 
 
 #####################################################################
@@ -168,6 +226,7 @@ def crear_tabla_Cursos():
 
 
 
+
 def crear_tabla_Talleres():
     conn = get_connection()
     cur = conn.cursor()
@@ -190,4 +249,20 @@ def crear_tabla_Talleres():
     conn.commit()
     cur.close()
 
+def crear_tablaAdd():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS Talleres (
+            id SERIAL PRIMARY KEY,
+            Nombre TEXT,
+            Correo TEXT,
+            Fecha de registro TEXT,
+            Rol TEXT,
+            Estado TEXT,
+        )
+    """)
+    conn.commit()
+    cur.close()
+    
 
