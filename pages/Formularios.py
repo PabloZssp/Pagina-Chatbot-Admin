@@ -303,7 +303,7 @@ def modificar(T_select):
          G_b =st.button("Guardar cambios")
         
     if G_b:
-            cnx.actualizar_registro(id_seleccionado, Titulo, Recinto, Direccion, Mes, Fechas, Hora, Duracion, Descripcion, Categoria, Costo, Url)
+            cnx.actualizar_registro(T_select,id_seleccionado, Titulo, Recinto, Direccion, Mes, Fechas, Hora, Duracion, Descripcion, Categoria, Costo, Url)
             st.success("Registro actualizado correctamente")
     
 
@@ -336,13 +336,11 @@ def leer(entrada):
 @st.dialog("Eliminar",width="large")
 def eliminar(entrada):
     st.subheader("Eliminar un registro existente")
-    diccionario_tablas = cnx.obtener_tablas()
-    
-    
-    Menu_tabla = [" ","eventos", "actividades", "cursos", "talleres"]
+   
 
     if entrada == "Base de datos":
-
+        
+        diccionario_tablas = cnx.obtener_tablas()
         tablas = st.selectbox("Selecciona una tabla", options=list(diccionario_tablas.values()))
         
         if tablas == "eventos":   
@@ -355,11 +353,25 @@ def eliminar(entrada):
                    ])
                  st.subheader(" Registros guardados")
                  st.dataframe(df_eventos, use_container_width=True)
-             st.write("Selecciona el campo a modificar")
-    
+             st.write("Selecciona el campo a Eliminar")
+             c1,c2 = st.columns([5,5])
              ids = cnx.editar_campo(tablas)
-             id_seleccionado = st.selectbox("Selecciona un ID", ids)
-             registro = cnx.obtener_registro_id(id_seleccionado, tablas)
+             with c1:
+              id_seleccionado = st.selectbox("Selecciona un ID", ids) 
+              registro=cnx.obtener_registro_id(id_seleccionado, tablas)
+             with c2:
+                
+                st.text(f"Título: {registro[0]}")
+                st.text(f"Recinto: {registro[1]}")
+                st.text(f"Dirección: {registro[2]}")
+
+            
+             B_El = st.button(" Eliminar registro")
+
+             if B_El:
+                cnx.eliminar_registro(tablas,id_seleccionado)
+                st.success(f"Se elimino el registro {registro[0]} exitosamente")
+             
                      
 ###############################################
         elif tablas == "actividades":
@@ -372,11 +384,24 @@ def eliminar(entrada):
                    ])
                  st.subheader(" Registros guardados")
                  st.dataframe(df_actividades, use_container_width=True)
-             st.write("Selecciona el campo a modificar")
-    
+             st.write("Selecciona el campo a Eliminar")
+             c1,c2 = st.columns([5,5])
              ids = cnx.editar_campo(tablas)
-             id_seleccionado = st.selectbox("Selecciona un ID", ids)
-             registro = cnx.obtener_registro_id(id_seleccionado, tablas)
+             with c1:
+              id_seleccionado = st.selectbox("Selecciona un ID", ids) 
+              registro=cnx.obtener_registro_id(id_seleccionado, tablas)
+             with c2:
+                
+                st.text(f"Título: {registro[0]}")
+                st.text(f"Recinto: {registro[1]}")
+                st.text(f"Dirección: {registro[2]}")
+
+            
+             B_El = st.button(" Eliminar registro")
+
+             if B_El:
+                cnx.eliminar_registro(tablas,id_seleccionado)
+                st.success(f"Se elimino el registro {registro[0]} exitosamente")
 ###############################################
         elif tablas == "cursos":
              eventos = cnx.obtenerCursos()
@@ -388,11 +413,24 @@ def eliminar(entrada):
                    ])
                  st.subheader(" Registros guardados")
                  st.dataframe(df_cursos, use_container_width=True)
-             st.write("Selecciona el campo a modificar")
-    
+             st.write("Selecciona el campo a Eliminar")
+             c1,c2 = st.columns([5,5])
              ids = cnx.editar_campo(tablas)
-             id_seleccionado = st.selectbox("Selecciona un ID", ids)
-             registro = cnx.obtener_registro_id(id_seleccionado, tablas)
+             with c1:
+              id_seleccionado = st.selectbox("Selecciona un ID", ids) 
+              registro=cnx.obtener_registro_id(id_seleccionado, tablas)
+             with c2:
+                
+                st.text(f"Título: {registro[0]}")
+                st.text(f"Recinto: {registro[1]}")
+                st.text(f"Dirección: {registro[2]}")
+
+            
+             B_El = st.button(" Eliminar registro")
+
+             if B_El:
+                cnx.eliminar_registro(tablas,id_seleccionado)
+                st.success(f"Se elimino el registro {registro[0]} exitosamente")
 ################################################
         elif tablas == "talleres":
              eventos = cnx.obtener_Talleres()
@@ -403,16 +441,28 @@ def eliminar(entrada):
                    ])
                  st.subheader(" Registros guardados")
                  st.dataframe(df_talleres, use_container_width=True)
-             st.write("Selecciona el campo a modificar")
-    
+             st.write("Selecciona el campo a Eliminar")
+             c1,c2 = st.columns([5,5])
              ids = cnx.editar_campo(tablas)
-             id_seleccionado = st.selectbox("Selecciona un ID", ids)
-             registro = cnx.obtener_registro_id(id_seleccionado, tablas)
+             with c1:
+              id_seleccionado = st.selectbox("Selecciona un ID", ids) 
+              registro=cnx.obtener_registro_id(id_seleccionado, tablas)
+             with c2:
+                
+                st.text(f"Título: {registro[0]}")
+                st.text(f"Recinto: {registro[1]}")
+                st.text(f"Dirección: {registro[2]}")
 
+            
+             B_El = st.button(" Eliminar registro")
+
+             if B_El:
+                cnx.eliminar_registro(tablas,id_seleccionado)
+                st.success(f"Se elimino el registro {registro[0]} exitosamente")
         
 
-#    if entrada == "Markdown":
-       # tablas= st.selectbox("Selecciona el Markdown", options= Menu_Elim, index = 0)
+    if entrada == "Markdown":
+       tablas= st.selectbox("Selecciona el Markdown", options= ["", "mRK1","Mrk2"], index = 0)
 
 
 BasesDatos()

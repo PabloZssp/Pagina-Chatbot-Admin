@@ -1,18 +1,6 @@
 import psycopg2
 
 
-def Conectar_BD():
-    conn = psycopg2.connect('postgres://avnadmin:AVNS_BVDiq3SEleEgX51PwfA@pg-106b1540-pruebaconexionfront.c.aivencloud.com:18155/defaultdb?sslmode=require')
-
-    query_sql = 'SELECT VERSION()'
-
-    cur = conn.cursor()
-    cur.execute(query_sql)
-
-    version = cur.fetchone()[0]
-    print(version)
-
-
 def get_connection():
     return psycopg2.connect(
         'postgres://avnadmin:AVNS_BVDiq3SEleEgX51PwfA@pg-106b1540-pruebaconexionfront.c.aivencloud.com:18155/defaultdb?sslmode=require'
@@ -92,15 +80,7 @@ def obtener_tablas():
     diccionario = {tabla: tabla for tabla in tablas}
     return diccionario
 
-# eventos = cnx.obtener_eventos()
 
- #       if eventos:
-  #          df_eventos = pd.DataFrame(eventos, columns=[
-   #             "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
-    #            "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
-     #       ])
-      #      st.subheader(" Registros guardados")
-       #     st.dataframe(df_eventos, use_container_width=True)
 
 def editar_campo(t_seleccion):
     conn = get_connection()
@@ -125,12 +105,12 @@ def obtener_registro_id(id_evento, t_Select):
     return evento
 
 
-def actualizar_registro(id, titulo, recinto, direccion, mes, fechas, hora, duracion, descripcion, categoria, costo, url):
+def actualizar_registro(Tabla, id, titulo, recinto, direccion, mes, fechas, hora, duracion, descripcion, categoria, costo, url):
     conn = get_connection()
     cur = conn.cursor()
     
-    query = """
-        UPDATE eventos SET
+    query = f"""
+        UPDATE {Tabla} SET
             Titulo = %s,
             Recinto = %s,
             Direccion = %s,
@@ -171,6 +151,19 @@ def Crear_registro(Tabla, title_text, building_name_text, address_text, month_te
     
     conn.commit()
     cur.close()
+
+def eliminar_registro(tabla, id):
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        query = f"DELETE FROM {tabla} WHERE id = %s"
+        cur.execute(query, (id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+    except Exception as e:
+        print(f"Error al eliminar el registro: {e}")
 
 
 
