@@ -2,9 +2,8 @@
 import streamlit as st
 import pandas as pd
 import Herramientas as h  # Módulo de herramientas para links de las páginas
-import sqlmodel as sql
-import Conexion as cnx
-
+import Conexion as cnx # Módulo para la conexion de bases de datos de pruebas
+import conexion2 as cn # Módulo para la conexion de la base de datos principal 
 
 def BasesDatos():
     
@@ -71,20 +70,18 @@ def opciones(entrada):
     if opcion == "Crear":
         crear(entrada)
     elif opcion == "Leer":
-        leer(entrada)
-        
+        leer(entrada)     
     elif opcion == "Eliminar":
         eliminar(entrada)
+
+
+
 
 @st.dialog("Crear",width="large")
 def crear(entrada):
 
     Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-    crear_tabla_eventos()
-    cnx.crear_tabla_Actividades()
-    cnx.crear_tabla_Cursos()
-    cnx.crear_tabla_Talleres()
-    #cnx.crear_tablaAdd()
+  
 
     st.subheader("Crear un nuevo registro")
     col1, col2, col3, col4 = st.columns([2,3,2,3])
@@ -200,23 +197,8 @@ def crear(entrada):
 
         st.subheader("**Descripción:**")
         description = st.text_area(" ", height=300, placeholder="Escribe aquí la descripción del evento o actividad...")
-        if st.button("Guardar registro"):
-                try:
-                    conn = cnx.get_connection()
-                    cur = conn.cursor()
-                    cur.execute("""
-                        INSERT INTO Eventos (
-                            titulo, recinto, direccion, mes, fechas, hora, duracion, categoria, costo, url, descripcion
-                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    """, (
-                        title_text, building_name_text, address_text, month_text, dates_text,
-                        hora_text, duracion_text, category_text, cost_text, url, description_text
-                    ))
-                    conn.commit()
-                    cur.close()
-                    st.success("Registro guardado exitosamente")
-                except Exception as e:
-                    st.error(f" Error al guardar el registro: {e}")
+        if st.button("Guardar "):
+           st.success("Markdown Guardado")    
         
 
 
@@ -306,13 +288,19 @@ def modificar(T_select):
             cnx.actualizar_registro(T_select,id_seleccionado, Titulo, Recinto, Direccion, Mes, Fechas, Hora, Duracion, Descripcion, Categoria, Costo, Url)
             st.success("Registro actualizado correctamente")
     
-
-        
+###########################################################################
+############################### FUNCION LEER ##############################
+###########################################################################     
 #@st.dialog("Leer")
 def leer(entrada):
 
     if entrada == "Base de datos":
+       tablas_abacus=cn.obtener_tablas()
+       T_a=st.selectbox("tabalas disponibles:", options=list(tablas_abacus.values()))
+       Campos_abacus=cn.obtener_campos(T_a)
+       st.selectbox("Campos disponibles",options= list(Campos_abacus.values()))
 
+       
        st.subheader("Leer registros")
        diccionario_tablas = cnx.obtener_tablas()
        tablas = st.selectbox("Selecciona una tabla", options=list(diccionario_tablas.values()))
@@ -330,8 +318,8 @@ def leer(entrada):
         st.subheader("Leer registros")
 
 
-
-
+##########################################################################
+##########################################################################
     
 @st.dialog("Eliminar",width="large")
 def eliminar(entrada):
@@ -452,7 +440,7 @@ def eliminar(entrada):
                 st.text(f"Título: {registro[0]}")
                 st.text(f"Recinto: {registro[1]}")
                 st.text(f"Dirección: {registro[2]}")
-
+                
             
              B_El = st.button(" Eliminar registro")
 
