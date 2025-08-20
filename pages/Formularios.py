@@ -199,8 +199,6 @@ def crear(entrada):
         description = st.text_area(" ", height=300, placeholder="Escribe aquí la descripción del evento o actividad...")
         if st.button("Guardar "):
            st.success("Markdown Guardado")    
-        
-
 
 
 
@@ -251,6 +249,13 @@ def selec_comp(Select):
             st.header("Registros Actividades Guardados")
             st.dataframe(df_activ)
 
+    elif Select == "alcaldias_faq":
+        alcaldias = cn.obtener_eventos(Select)
+        if alcaldias:
+            df_alca = pd.DataFrame(alcaldias, columns=["id", "title", "category", "pregunta", "respuesta"])
+            st.header("registros")
+            st.dataframe(df_alca)
+
 
 @st.dialog("Modificar")
 def modificar(T_select):
@@ -295,11 +300,6 @@ def modificar(T_select):
 def leer(entrada):
 
     if entrada == "Base de datos":
-       tablas_abacus=cn.obtener_tablas()
-       T_a=st.selectbox("tabalas disponibles:", options=list(tablas_abacus.values()))
-       Campos_abacus=cn.obtener_campos(T_a)
-       st.selectbox("Campos disponibles",options= list(Campos_abacus.values()))
-
        
        st.subheader("Leer registros")
        diccionario_tablas = cnx.obtener_tablas()

@@ -151,7 +151,36 @@ def Crear_registro(Tabla, title_text, building_name_text, address_text, month_te
     
     conn.commit()
     cur.close()
+    
+def Crear_registro2(tabla, valores):
+        try:
+            # Conexión a la base de datos
+            conn = get_connection()
+            cursor = conn.cursor()
 
+            # Extraer columnas y valores
+            columnas = list(valores.keys())
+            datos = list(valores.values())
+
+            # Construir SQL dinámico
+            columnas_sql = ", ".join(columnas)
+            placeholders = ", ".join(["%s"] * len(columnas))
+
+            query = f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})"
+
+            # Ejecutar la consulta
+            cursor.execute(query, datos)
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+            return True
+        except Exception as e:
+            print(f"Error al insertar registro: {e}")
+            return False
+        
+
+        
 def eliminar_registro(tabla, id):
     try:
         conn = get_connection()
