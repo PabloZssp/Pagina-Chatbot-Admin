@@ -8,10 +8,10 @@ import conexion2 as cn # Módulo para la conexion de la base de datos principal
 def BasesDatos():
     
     h.MenuPrincipal()
-    st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬")
+    st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬", layout="wide")
     
-    st.title("Componetes")    
- 
+    h.st_normal().markdown("<h1 style='text-align= center;'> Componentes </h1>", unsafe_allow_html=True)
+
     
     # Aquí puedes agregar más opciones en la barra lateral si es necesario
 

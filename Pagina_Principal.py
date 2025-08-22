@@ -10,9 +10,9 @@ import streamlit as st
 import Herramientas as h #modulo de herramientas para links de las paginas
 
 col_1,col_2=st.columns(2)
-st.set_page_config(page_title="Pagina principal", initial_sidebar_state="auto",page_icon="🤖", layout="centered")
+st.set_page_config(page_title="Pagina principal", initial_sidebar_state="auto",page_icon="🤖", layout="wide")
 
-st.header("CHATBOT ADMIN")
+h.st_normal().markdown("<h1 style='text-align= center;'> CHATBOT ADMIN </h1>", unsafe_allow_html=True)
 st.subheader("Bienvenido al Chatbot Admin, aqui podras administrar los datos de tu chatbot")
 
 col_1,col_2=st.columns(2)
