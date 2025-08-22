@@ -231,7 +231,7 @@ def crear2(baseD):
                 valores[campo] = st.date_input(f"**{campo}:**")
             elif "dates" in campo.lower():
                 valores[campo] =st.date_input(f"{campo}:")
-            elif "mes" in campo.lower():
+            elif "month"  in campo.lower():
                 valores[campo] = st.selectbox(f"{campo}:", options=Opt_M)
             elif "descripcion"  in campo.lower():
                 valores[campo] =st.text_area(f"{campo}:",height=100,placeholder="Escribe aqui tu descrpcion:")

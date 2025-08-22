@@ -11,13 +11,6 @@ def MenuPrincipal():
          st.page_link("pages/Chatbot.py",label="Graficas",icon="📊")
         # st.page_link("pages/MENU_BD.py",label= "TEST")
 
-# Ejemplo de como aaceder  a las variables de la configuracion  de la conexion a la base de datos
-# en este caso se usara para crear la conexion a la base de datos
-#Server= st.secrets["BasesDatos"]["Host"] 
-#DataBase= st.secrets["BasesDatos"]["nombre_bd"]
-#User= st.secrets["BasesDatos"]["Usuario"]
-#Password= st.secrets["BasesDatos"]["password"]
-#Port= st.secrets["BasesDatos"]["puerto"]
 
 
    
@@ -35,7 +28,7 @@ page_bg_img = """
 
 
 [data-testid="stHeader"] {
-    background-color: rgba(188, 149, 92, 0.2);
+    background-color: rgba(188, 149, 92, 0.1);
 
 }
 
