@@ -10,9 +10,9 @@ def st_normal():
 def MenuPrincipal():
     
     with st.sidebar:
-         st.page_link("Pagina_Principal.py",label="Pagina Principal",icon="🤖")
-         st.page_link("pages/Formularios.py",label="Componetes",icon="📝")
-         st.page_link("pages/Chatbot.py",label="Graficas",icon="📊")
+         st.page_link("Pagina_Principal.py",label=" Página Principal",icon="🏠")
+         st.page_link("pages/Formularios.py",label=" Componentes",icon="📝")
+         st.page_link("pages/Chatbot.py",label=" Gráficas",icon="📊")
          st.page_link("pages/MENU_BD.py",label= "TEST")
 
 # Ejemplo de como aaceder  a las variables de la configuracion  de la conexion a la base de datos
@@ -32,14 +32,61 @@ def MenuPrincipal():
 page_bg_img = """
 
 <style>
-[data-testid="stAppViewContainer"] {
-    background-color: #F8F9FA;
-    background-size: cover;
+[data-testid="stMain"] {
+
 }
 
-[data-testid="stMainBlockContainer"]{
-padding: 3rem 1rem 3rem;
+[data-testid="stVerticalBlock"]{
+display: flex;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+text-align:center;
+padding-top:15px;
+padding-bottom:10px;
+}
 
+
+
+[data-testid="stAppViewContainer"] {
+background-color: #F8F9FA;
+background-size: cover;
+}
+
+/* Solo los títulos del contenedor principal */
+.stAppViewContainer h1,
+.stAppViewContainer h2 {
+color: #800020 !important;
+text-align: center !important;
+font-family: 'Segoe UI', sans-serif !important;
+font-weight: 600 !important;
+}
+
+.stAppViewContainer h3{
+color: grey important;
+}
+
+button {
+padding: 1rem 2rem !important;
+background-color: #8b233f !important;
+}
+
+button p{
+font-weight:700 !important;
+color: white !important;
+font-size: 1.3rem !important;
+transform: scale(1) !important;
+}
+
+button:hover{
+box-shadow: 3px 5px 3px rgba(0, 0, 0, 0.2) !important;
+transform: scale(0.9) !important;
+transition: box-shadow 0.3s ease-in-out !important;
+transition: all 500ms !important; 
+}
+
+[data-testid="stWidgetLabel"] {
+color: #848889 !important;
 }
 
 [data-testid="stElementContainer"]{
@@ -48,7 +95,8 @@ text-align: center;
 }
 
 [data-testid="stHeader"] {
-    background-color: #8b233f;
+background-color: #8b233f;
+color: white;
 
 }
 
@@ -57,6 +105,7 @@ text-align: center;
     background: linear-gradient(to bottom, #8b233f, #b34d66);
     //background-color: rgb( 114, 19, 34);
     background-size: cover;
+    color: white !important;
 }
 
 [data-testid="stSidebar"] * {

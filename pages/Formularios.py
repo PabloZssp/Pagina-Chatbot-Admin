@@ -10,7 +10,7 @@ def BasesDatos():
     h.MenuPrincipal()
     st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬", layout="wide")
     
-    h.st_normal().markdown("<h1 style='text-align= center;'> Componentes </h1>", unsafe_allow_html=True)
+    h.st_normal().title("Componentes")
 
     
     # Aquí puedes agregar más opciones en la barra lateral si es necesario
@@ -20,7 +20,7 @@ def BasesDatos():
     
     
 
-    eleccion=st.selectbox("Selecciona una opción",options=Menu, index=0)
+    eleccion=h.st_normal().selectbox("Selecciona una opción",options=Menu, index=0)
 
     #A partir de aqui vamos a poner la mayoria de las opciones que tendra la pagina
     #como los botones para los formularios ya sea para los markdowns o para una base de datos
@@ -28,9 +28,9 @@ def BasesDatos():
     #lo dejamos asi en la pagina para la version final
 
     if eleccion == "Base de datos":
-         
+        
         opciones(eleccion)  # Llama a la función opciones para mostrar las opciones de crear, modificar, leer y eliminar registros
-       
+    
     if eleccion == "Markdown":
         
         opciones(eleccion)

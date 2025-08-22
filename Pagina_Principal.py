@@ -9,22 +9,31 @@
 import streamlit as st
 import Herramientas as h #modulo de herramientas para links de las paginas
 
-col_1,col_2=st.columns(2)
+#col_1,col_2=st.columns(2)
 st.set_page_config(page_title="Pagina principal", initial_sidebar_state="auto",page_icon="🤖", layout="wide")
 
-h.st_normal().markdown("<h1 style='text-align= center;'> CHATBOT ADMIN </h1>", unsafe_allow_html=True)
-st.subheader("Bienvenido al Chatbot Admin, aqui podras administrar los datos de tu chatbot")
+h.st_normal().title(" ChatBot Admin ") #se define el estilo de columnas en h
+st.subheader("Bienvenido al Chatbot Admin, aqui podrás seleccionar los aspectos que desees administrar dentro del chatbot.")
 
-col_1,col_2=st.columns(2)
-with col_1:
-    bt_A = st.button("Ir a Componetes")
+with st.container():
+ st.markdown(
+        """
+        <div style="padding-top:4rem; font-size:18px;">
+        """,
+        unsafe_allow_html=True
+    )
+
+col_1, col_2, col_3, col_4 = st.columns([1,2,2,1])  # tamaños relativos
 
 with col_2:
-    bt_b = st.button("Ir a Graficas" )
+    bt_A = st.button("Ir a Componentes")
+
+with col_3:
+    bt_B = st.button("Ir a Gráficas")
 
 if bt_A:
     st.switch_page("pages/Formularios.py" )#boton para ir a la pagina de formularios
-if bt_b:
+if bt_B:
     st.switch_page("pages/Chatbot.py" )#boton para ir a la pagina de graficas
 
 
