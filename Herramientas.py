@@ -13,6 +13,7 @@ def MenuPrincipal():
          st.page_link("Pagina_Principal.py",label="Pagina Principal",icon="🤖")
          st.page_link("pages/Formularios.py",label="Componetes",icon="📝")
          st.page_link("pages/Chatbot.py",label="Graficas",icon="📊")
+         st.page_link("pages/MENU_BD.py",label= "TEST")
 
 # Ejemplo de como aaceder  a las variables de la configuracion  de la conexion a la base de datos
 # en este caso se usara para crear la conexion a la base de datos
