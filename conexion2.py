@@ -215,16 +215,77 @@ def eliminar_campo2(tabla, id):
             print(f"Error al eliminar el registro: {e}")
 
 #################################################################
+
+
 def obtener_eventos3(tabla):
-    query = f"SELECT * FROM {tabla} ORDER BY id ASC"
+    campos_id = {
+        'Arte_publico_monumentos': 'id_monumento',
+        'Bibliotecas_archivos':'id_biblioteca',
+        'Barrios_colonias': 'id_barrios',
+        'Centros_culturales': 'id_centro',
+        'Edificios_historicos':'id_edificio',
+        'Embajadas': 'id_embajada',
+        'Estaciones_de_metro': 'id_estacion',
+        'Galerias_de_arte':'id_galeria',
+        'Gran_aforo': 'id_aforo',
+        'Hoteles': 'id_hotel',
+        'Iglecias_catedrales':'id_iglecia',
+        'Ir_de_compras': 'id_plaza_comer',
+        'Mercados': 'id_mercado',
+        'Miradores':'id_mirador',
+        'Museos': 'id_museo',
+        'Parques_plazas_publicas': 'id_parque',
+        'Restaurantes':'id_rest',
+        'sitios_arqueologico': 'id_sitio',
+        'cat_hotel_estrellas': 'id_estrella',
+        'cat_restaurantes_estrellas':'id_estrella',
+        
+    }
+
+    nombre_id = campos_id.get(tabla)
+    if not nombre_id:
+        raise ValueError(f"No se encontró campo ID para la tabla '{tabla}'")
+
+    query = text(f'SELECT * FROM categorias."{tabla}" ORDER BY {nombre_id} ASC')
+
     with engine3.connect() as conn:
-        result = conn.execute(text(query))
+        result = conn.execute(query)
         rows = result.fetchall()
+
     return rows
 
 
 def editar_campo3(t_seleccion):
-    query = text(f"SELECT id FROM {t_seleccion} ORDER BY id")
+    campos_id = {
+        'Arte_publico_monumentos': 'id_monumento',
+        'Bibliotecas_archivos':'id_biblioteca',
+        'Barrios_colonias': 'id_barrios',
+        'Centros_culturales': 'id_centro',
+        'Edificios_historicos':'id_edificio',
+        'Embajadas': 'id_embajada',
+        'Estaciones_de_metro': 'id_estacion',
+        'Galerias_de_arte':'id_galeria',
+        'Gran_aforo': 'id_aforo',
+        'Hoteles': 'id_hotel',
+        'Iglecias_catedrales':'id_iglecia',
+        'Ir_de_compras': 'id_plaza_comer',
+        'Mercados': 'id_mercado',
+        'Miradores':'id_mirador',
+        'Museos': 'id_museo',
+        'Parques_plazas_publicas': 'id_parque',
+        'Restaurantes':'id_rest',
+        'sitios_arqueologico': 'id_sitio',
+        'cat_hotel_estrellas': 'id_estrella',
+        'cat_restaurantes_estrellas':'id_estrella',
+        
+    }
+
+    
+    campo_id = campos_id.get(t_seleccion)
+    if not campo_id:
+        raise ValueError(f"No se encontró campo ID para la tabla '{t_seleccion}'")
+
+    query = text(f'SELECT {campo_id} FROM categorias."{t_seleccion}" ORDER BY {campo_id}')
     with engine3.connect() as conn:
         result = conn.execute(query)
         ids = [row[0] for row in result.fetchall()]
@@ -235,27 +296,62 @@ def crear_registro3(tabla, valores):
     if not tabla or not valores:
         raise ValueError("Tabla y valores no pueden estar vacíos.")
 
-    columnas = list(valores.keys())
-    columnas_sql = ", ".join(columnas)
-    placeholders = ", ".join([f":{col}" for col in columnas])  # Usar :nombre para SQLAlchemy
+    
+    tabla_sql = f'"{tabla}"' if not tabla.islower() else tabla
 
-    query = text(f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})")
+    columnas = list(valores.keys())
+
+    
+    columnas_sql = ", ".join([f'"{col}"' for col in columnas])
+    placeholders = ", ".join([f":{col}" for col in columnas])
+
+    query = text(f"""
+        INSERT INTO categorias.{tabla_sql} ({columnas_sql})
+        VALUES ({placeholders})
+    """)
 
     try:
         with engine3.begin() as conn:
-            conn.execute(query, valores)  # valores es un dict
+            conn.execute(query, valores)
     except Exception as e:
-        print(f"Error al insertar registro: {e}")
-
-        
+        print(f" Error al insertar registro en '{tabla}': {e}")
 
 
 def obtener_registro_id3(id_evento, t_Select, campos):
-    columnas = ", ".join(campos)  # convierte la lista en texto SQL válido
+    campos_id = {
+        'Arte_publico_monumentos': 'id_monumento',
+        'Bibliotecas_archivos': 'id_biblioteca',
+        'Barrios_colonias': 'id_barrios',
+        'Centros_culturales': 'id_centro',
+        'Edificios_historicos': 'id_edificio',
+        'Embajadas': 'id_embajada',
+        'Estaciones_de_metro': 'id_estacion',
+        'Galerias_de_arte': 'id_galeria',
+        'Gran_aforo': 'id_aforo',
+        'Hoteles': 'id_hotel',
+        'Iglecias_catedrales': 'id_iglecia',
+        'Ir_de_compras': 'id_plaza_comer',
+        'Mercados': 'id_mercado',
+        'Miradores': 'id_mirador',
+        'Museos': 'id_museo',
+        'Parques_plazas_publicas': 'id_parque',
+        'Restaurantes': 'id_rest',
+        'sitios_arqueologico': 'id_sitio',
+        'cat_hotel_estrellas': 'id_estrella',
+        'cat_restaurantes_estrellas': 'id_estrella',
+    }
+
+    columna_id = campos_id.get(t_Select)
+    if not columna_id:
+        raise ValueError(f"No se encontró columna ID para la tabla '{t_Select}'")
+
+    
+    columnas_sql = ", ".join([f'"{col}"' if not col.islower() else col for col in campos])
 
     query = text(f"""
-        SELECT {columnas}
-        FROM {t_Select} WHERE id = :id_evento
+        SELECT {columnas_sql}
+        FROM categorias."{t_Select}"
+        WHERE {columna_id} = :id_evento
     """)
 
     with engine3.connect() as conn:
@@ -264,44 +360,112 @@ def obtener_registro_id3(id_evento, t_Select, campos):
 
     return evento
 
-def actualizar_registro3(tabla, id_registro, nuevos_valores):
-    set_clause = ", ".join([f"{campo} = :{campo}" for campo in nuevos_valores])
-    query = text(f"UPDATE {tabla} SET {set_clause} WHERE id = :id")
 
-    nuevos_valores["id"] = id_registro
+
+def actualizar_registro3(tabla, id_registro, nuevos_valores):
+    campos_id = {
+        'Arte_publico_monumentos': 'id_monumento',
+        'Bibliotecas_archivos': 'id_biblioteca',
+        'Barrios_colonias': 'id_barrios',
+        'Centros_culturales': 'id_centro',
+        'Edificios_historicos': 'id_edificio',
+        'Embajadas': 'id_embajada',
+        'Estaciones_de_metro': 'id_estacion',
+        'Galerias_de_arte': 'id_galeria',
+        'Gran_aforo': 'id_aforo',
+        'Hoteles': 'id_hotel',
+        'Iglecias_catedrales': 'id_iglecia',
+        'Ir_de_compras': 'id_plaza_comer',
+        'Mercados': 'id_mercado',
+        'Miradores': 'id_mirador',
+        'Museos': 'id_museo',
+        'Parques_plazas_publicas': 'id_parque',
+        'Restaurantes': 'id_rest',
+        'sitios_arqueologico': 'id_sitio',
+        'cat_hotel_estrellas': 'id_estrella',
+        'cat_restaurantes_estrellas': 'id_estrella',
+    }
+
+    columna_id = campos_id.get(tabla)
+    if not columna_id:
+        raise ValueError(f"No se encontró columna ID para la tabla '{tabla}'")
+
+    
+    set_clause = ", ".join([f'"{campo}" = :{campo}' for campo in nuevos_valores])
+
+    query = text(f"""
+    UPDATE "categorias"."{tabla}"
+    SET {set_clause}
+    WHERE "{columna_id}" = :id_registro;
+      """)
+
+
+    nuevos_valores["id_registro"] = id_registro
 
     with engine3.connect() as conn:
-        conn.execute(query, nuevos_valores)
+        conn.execute(query, {"id_registro":id_registro},nuevos_valores)
         conn.commit()
+
+
 
 def obtener_tablas3():
     query = text("""
         SELECT table_name
         FROM information_schema.tables
-        WHERE table_schema = 'public'
+        WHERE table_schema = 'categorias'
         ORDER BY table_name;
     """)
     with engine3.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
 
+
+
 def obtener_campos3(tabla):
-    """Devuelve un diccionario {columna: columna} de la tabla indicada."""
-    query = text("""
+    query = text(f"""
         SELECT column_name
         FROM information_schema.columns
-        WHERE table_schema = 'public'
-        AND table_name = :tabla
+        WHERE table_schema = 'categorias'
+        AND table_name = '{tabla}'
         ORDER BY ordinal_position;
     """)
     with engine3.connect() as conn:
-        columnas = [row[0] for row in conn.execute(query, {"tabla": tabla})]
+        columnas = [row[0] for row in conn.execute(query)]
     return {col: col for col in columnas}
 
 
 
+
 def eliminar_campo3(tabla, id):
-    query = text(f"DELETE FROM {tabla} WHERE id = :id")
+    campos_id = {
+        'Arte_publico_monumentos': 'id_monumento',
+        'Bibliotecas_archivos': 'id_biblioteca',
+        'Barrios_colonias': 'id_barrios',
+        'Centros_culturales': 'id_centro',
+        'Edificios_historicos': 'id_edificio',
+        'Embajadas': 'id_embajada',
+        'Estaciones_de_metro': 'id_estacion',
+        'Galerias_de_arte': 'id_galeria',
+        'Gran_aforo': 'id_aforo',
+        'Hoteles': 'id_hotel',
+        'Iglecias_catedrales': 'id_iglecia',
+        'Ir_de_compras': 'id_plaza_comer',
+        'Mercados': 'id_mercado',
+        'Miradores': 'id_mirador',
+        'Museos': 'id_museo',
+        'Parques_plazas_publicas': 'id_parque',
+        'Restaurantes': 'id_rest',
+        'sitios_arqueologico': 'id_sitio',
+        'cat_hotel_estrellas': 'id_estrella',
+        'cat_restaurantes_estrellas': 'id_estrella',
+    }
+
+    columna_id = campos_id.get(tabla)
+    if not columna_id:
+        raise ValueError(f"No se encontró columna ID para la tabla '{tabla}'")
+
+    query = text(f"""DELETE FROM "categorias"."{tabla}"
+                  WHERE "{columna_id}" = :id""")
     with engine3.connect() as conn:
         trans = conn.begin()
         try:

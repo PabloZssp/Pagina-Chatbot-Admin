@@ -209,9 +209,9 @@ def crear2(baseD):
          campos =cn.obtener_campos2(slect_t)
     
     elif baseD=="chatbot_turismo":
-         tabla = cn.obtener_tablas2()
+         tabla = cn.obtener_tablas3()
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos2(slect_t)     # obtiene los datos de la tabla
+         campos =cn.obtener_campos3(slect_t)     # obtiene los datos de la tabla
     else:
         st.text("seleciona una base de datos valida")
    
@@ -223,7 +223,8 @@ def crear2(baseD):
     indice = 0  
     
     for  campo in campos:
-        if campo.lower() == "id":
+        if campo.lower() == "id"or campo.lower().startswith("id_"):
+
             continue
         with col1 if indice % 2 == 0 else col2:
             if "fecha" in campo.lower():
@@ -251,7 +252,7 @@ def crear2(baseD):
                  cn.crear_registro(slect_t, valores)
                  st.success("Registro guardado exitosamente")
             elif baseD=="chatbot_turismo":
-                 cn.crear_registro(slect_t, valores)
+                 cn.crear_registro3(slect_t, valores)
                  st.success("Registro guardado exitosamente")
             else:
                 st.error("seleciona una base de datos valida")
@@ -333,11 +334,11 @@ def modificar2(t_elec,bdatos):
       registro= cn.obtener_registro_id2(id_seleccionado,t_elec,campos)
 
     elif bdatos=="chatbot_turismo":
-      campos =cn.obtener_campos(t_elec)
+      campos =cn.obtener_campos3(t_elec)
       st.write("Selecciona el campo a modificar")
-      ids = cn.editar_campo(t_elec)
+      ids = cn.editar_campo3(t_elec)
       id_seleccionado = st.selectbox("Selecciona un ID", ids)
-      registro= cn.obtener_registro_id2(id_seleccionado,t_elec,campos)
+      registro= cn.obtener_registro_id3(id_seleccionado,t_elec,campos)
 
     else:
         st.text("seleciona una base de datos valida")
@@ -353,7 +354,6 @@ def modificar2(t_elec,bdatos):
 
     for campo in campos:
         
-
         with col1 if valor_idx % 2 == 0 else col2:
             valor_actual = registro[valor_idx]
 
@@ -371,6 +371,7 @@ def modificar2(t_elec,bdatos):
                 valores[campo] = st.text_input(f"{campo}:", value=valor_actual)
 
         valor_idx += 1
+    st.text(f"tabla: {t_elec}")    
     G_b= st.button("Guardar cambios")
     if G_b:
 
@@ -473,7 +474,7 @@ def eliminar2(Bdatos):
          elif Bdatos=="chatbot_turismo":
           
           st.text(f"ID: {registro[0]}")
-          st.text(f"Nombre: {registro[1]}")
+          st.text(f"Nombre/categoria: {registro[1]}")
           
    
     b_El = st.button("Eliminar registro")
