@@ -4,6 +4,9 @@ import Herramientas as h  # Módulo de herramientas para links de las páginas
 import Conexion as cnx # Módulo para la conexion de bases de datos de pruebas
 import conexion2 as cn
 
+h.verificar_sesion()
+h.acceso_multiple(["administrador"])
+
 
 def menu_BD():
     h.MenuPrincipal()
@@ -359,7 +362,7 @@ def modificar2(t_elec,bdatos):
 
             if "fecha" in campo.lower() or "dates" in campo.lower():
                 valores[campo] = st.date_input(f"{campo}:", value=None)
-            elif "mes" in campo.lower():
+            elif "month" in campo.lower():
                 valores[campo] = st.selectbox(f"{campo}:", options=Opt_M, index=Opt_M.index(valor_actual) if valor_actual in Opt_M else 0)
             elif "descripcion" in campo.lower():
                 valores[campo] = st.text_area(f"{campo}:", value=valor_actual, height=100, placeholder="Escribe aquí tu descripción:")
