@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import Herramientas as h  # 
 h.verificar_sesion()
-
+h.acceso_multiple(["administrador","usuario"])
 
 def graficas():
 
