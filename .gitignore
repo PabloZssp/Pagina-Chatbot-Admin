@@ -3,3 +3,5 @@ markdown
 testconection.py
 usuarios.json
 Dockerfile
+requirements.txt
+.dockerignore

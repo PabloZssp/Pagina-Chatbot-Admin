@@ -12,7 +12,7 @@ def menu_BD():
     st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬")
     st.markdown(h.page_bg_img, unsafe_allow_html=True)
     st.title("Bases de datos")
-    st.write("Rol actual:", st.session_state.get("rol", "No definido"))
+    
     Menu =[" ","eventos_cartelera","informacion_ux","chatbot_turismo","test"]
     
     Bdatos=st.selectbox("Selecciona una Base de datos:",options=Menu)

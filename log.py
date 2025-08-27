@@ -30,10 +30,8 @@ def log_out():
     
     for key in ["usuario", "rol"]:
         if key in st.session_state:
-            del st.session_state[key]
-
-   
-    st.switch_page("Inicio.py")
+            del st.session_state[key]   
+    st.switch_page("inicio.py")
 
 
 
