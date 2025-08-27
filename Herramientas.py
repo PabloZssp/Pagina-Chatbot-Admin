@@ -12,9 +12,11 @@ def MenuPrincipal():
          elif st.session_state["rol"] == "usuario":
             st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🤖")
             st.page_link("pages/Formularios.py", label="Componentes", icon="📝")
-           # st.page_link("pages/Chatbot.py", label="Gráficas", icon="📊")
-         #st.page_link("pages/log.py", label="login")
-         Ex_b = st.button("Salir.")
+            #st.page_link("pages/Chatbot.py", label="Gráficas", icon="📊")
+            #st.page_link("pages/log.py", label="login")
+         else:
+            st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🤖")
+         Ex_b = st.button("Salir")
          if Ex_b:
               l.log_out()
 
@@ -30,7 +32,7 @@ def verificar_sesion():
     
 def acceso_multiple(roles_permitidos):
     if "rol" not in st.session_state or st.session_state["rol"] not in roles_permitidos:
-        st.warning("⛔ No tienes permiso para acceder")
+        st.warning(" No tienes permiso para acceder")
         st.stop()
 
 ##Estes es es fondo de pantalla de la pagina la imagen es de prueba se puede cambiar por cualquier otra imagen
