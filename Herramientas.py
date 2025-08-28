@@ -9,10 +9,12 @@ def MenuPrincipal():
             st.page_link("pages/Formularios.py", label="Componentes", icon="📝")
             st.page_link("pages/Chatbot.py", label="Gráficas", icon="📊")
             st.page_link("pages/MENU_BD.py", label="TEST")
-         elif st.session_state["rol"] == "usuario":
+
+         elif st.session_state["rol"] in ["usuario", "usuarioUX", "usuarioCl", "usuarioTU"]:
             st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🤖")
             st.page_link("pages/Formularios.py", label="Componentes", icon="📝")
-            #st.page_link("pages/Chatbot.py", label="Gráficas", icon="📊")
+            #st.page_link("pages/MENU_BD.py", label="TEST")
+           #st.page_link("pages/Chatbot.py", label="Gráficas", icon="📊")
             #st.page_link("pages/log.py", label="login")
          else:
             st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🤖")
@@ -38,7 +40,7 @@ def acceso_multiple(roles_permitidos):
 ##Estes es es fondo de pantalla de la pagina la imagen es de prueba se puede cambiar por cualquier otra imagen
 ##Esta dividida en 2 partes una para el fondo de la pagina y otra para el fondo de la barra lateral
 ##
-##para cambiar la imagen solo hay que cambiar la url de la imagen en el string
+
 page_bg_img = """
 <style>
 [data-testid="stAppViewContainer"] {

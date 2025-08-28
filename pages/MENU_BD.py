@@ -3,9 +3,10 @@ import pandas as pd
 import Herramientas as h  # Módulo de herramientas para links de las páginas
 import Conexion as cnx # Módulo para la conexion de bases de datos de pruebas
 import conexion2 as cn
+import log
 
 h.verificar_sesion()
-h.acceso_multiple(["administrador"])
+h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
 
 def menu_BD():
@@ -14,10 +15,19 @@ def menu_BD():
     st.markdown(h.page_bg_img, unsafe_allow_html=True)
     st.title("Bases de datos")
     
-    Menu =[" ","eventos_cartelera","informacion_ux","chatbot_turismo","test"]
     
+    rol = log.obtener_rol_actual()
+    
+    if rol == "administrador":
+        Menu =[" ","eventos_cartelera","informacion_ux","chatbot_turismo","test"]
+    elif rol== "usuarioUX":
+        Menu =[" ","informacion_ux",]
+    elif rol== "usuarioCl":
+        Menu =[" ","eventos_cartelera"]
+    elif rol== "usuarioTU":
+        Menu =[" ","chatbot_turismo"]
+   
     Bdatos=st.selectbox("Selecciona una Base de datos:",options=Menu)
-
 
     if Bdatos == "informacion_ux":
         
@@ -33,8 +43,7 @@ def menu_BD():
 
     elif Bdatos == "test":        
         opciones2(Bdatos)
-
-        
+               
     
 def opciones(tabla,campos,Bdatos):
 
@@ -268,8 +277,8 @@ def crear2(baseD):
 def selec_comp2(tabla,basedatos):
    
     if basedatos=="test":
-        columnas = cnx.obtener_columnas(tabla)
-        registros= cnx.obtener_Actividades()
+        columnas = cn.obtener_campos4(tabla)
+        registros= cn.obtener_eventos4(tabla)
     elif basedatos=="informacion_ux":
         columnas = cn.obtener_campos(tabla)         # obtiene los nombres de las columnas
         registros = cn.obtener_eventos(tabla)        # obtiene los datos de la tabla
@@ -292,7 +301,7 @@ def leer2(basedatos):
        st.subheader(f"Leer registros de: {basedatos} ")
 
        if basedatos=="test":
-            diccionario_tablas = cnx.obtener_tablas()
+            diccionario_tablas = cn.obtener_tablas4()
        elif basedatos=="informacion_ux":
            diccionario_tablas= cn.obtener_tablas()
        elif basedatos=="eventos_cartelera":

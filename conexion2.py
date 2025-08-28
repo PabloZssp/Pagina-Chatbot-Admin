@@ -10,12 +10,14 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
+DB_NAMEU = os.getenv("DB_NAMEU")
+DB_NAMEC = os.getenv("DB_NAMEC")
+DB_NAMET = os.getenv("DB_NAMET")
 
 
-DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-DATABASE_URL2 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/eventos_cartelera"
-DATABASE_URL3 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/chatbot_turismo"
+DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEU}"
+DATABASE_URL2 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEC}"
+DATABASE_URL3 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMET}"
 
 
 
@@ -23,6 +25,19 @@ engine = create_engine(DATABASE_URL)
 engine2 = create_engine(DATABASE_URL2)
 engine3 = create_engine(DATABASE_URL3)
 
+
+
+
+#usuarios conexion 
+DB_USER2 = os.getenv("DB_USER2")
+DB_PASSWORD2 = os.getenv("DB_PASSWORD2")
+DB_HOST2 = os.getenv("DB_HOST2")
+DB_PORT2 = os.getenv("DB_PORT2")
+DB_NAME2 = os.getenv("DB_NAME2")
+
+DATABASE_URL4 = f"postgresql+psycopg2://{DB_USER2}:{DB_PASSWORD2}@{DB_HOST2}:{DB_PORT2}/{DB_NAME2}"
+
+engine4 = create_engine(DATABASE_URL4)
     
 def obtener_eventos(tabla):
     query = f"SELECT * FROM {tabla} ORDER BY id ASC"
@@ -474,3 +489,46 @@ def eliminar_campo3(tabla, id):
         except Exception as e:
             trans.rollback()
             print(f"Error al eliminar el registro: {e}")
+
+###########Conexion users###############
+
+def obtener_tablas4():
+    query = text("""
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'herramientas'
+        ORDER BY table_name;
+    """)
+    with engine4.connect() as conn:
+        tablas = [row[0] for row in conn.execute(query)]
+    return {tabla: tabla for tabla in tablas}
+
+def obtener_eventos4(tabla):
+    query = text(f"SELECT * FROM herramientas.{tabla} ORDER BY id ASC")
+    with engine4.connect() as conn:
+        result = conn.execute(query)  
+        rows = result.fetchall()
+    return rows
+
+def obtener_campos4(tabla):
+    query = text(f"""
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'herramientas'
+        AND table_name = '{tabla}'
+        ORDER BY ordinal_position;
+    """)
+    with engine4.connect() as conn:
+        columnas = [row[0] for row in conn.execute(query)]
+    return {col: col for col in columnas}
+
+def validar_usuario(usuario, password):
+   
+    query = text("""
+        SELECT username, role
+        FROM herramientas.usuarios
+        WHERE username = :u AND password = :p
+    """)
+    with engine4.connect() as conn:
+        result = conn.execute(query, {"u": usuario, "p": password}).fetchone()
+        return result

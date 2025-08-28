@@ -4,17 +4,25 @@ import pandas as pd
 import Herramientas as h  # Módulo de herramientas para links de las páginas
 import Conexion as cnx # Módulo para la conexion de bases de datos de pruebas
 import conexion2 as cn # Módulo para la conexion de la base de datos principal 
+import log 
 h.verificar_sesion()
-h.acceso_multiple(["administrador","usuario"])
+h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
 def menu_BD():
     h.MenuPrincipal()
     st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬")
     st.markdown(h.page_bg_img, unsafe_allow_html=True)
     st.title("Bases de datos")
+    rol = log.obtener_rol_actual()
     
-    Menu =[" ","eventos_cartelera","informacion_ux","chatbot_turismo","test"]
-    
+    if rol == "administrador":
+        Menu =[" ","eventos_cartelera","informacion_ux","chatbot_turismo","test"]
+    elif rol== "usuarioUX":
+        Menu =[" ","informacion_ux",]
+    elif rol== "usuarioCl":
+        Menu =[" ","eventos_cartelera"]
+    elif rol== "usuarioTU":
+        Menu =[" ","chatbot_turismo"]
     Bdatos=st.selectbox("Selecciona una Base de datos:",options=Menu)
 
     if Bdatos == "informacion_ux":

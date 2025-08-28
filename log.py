@@ -34,7 +34,11 @@ def log_out():
     st.switch_page("inicio.py")
 
 
-
+def obtener_rol_actual():
+    if "rol" in st.session_state:
+        return st.session_state["rol"]
+    else:
+        return None
 
 
 
