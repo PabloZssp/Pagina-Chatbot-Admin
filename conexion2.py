@@ -532,3 +532,14 @@ def validar_usuario(usuario, password):
     with engine4.connect() as conn:
         result = conn.execute(query, {"u": usuario, "p": password}).fetchone()
         return result
+    
+def validar_usuario(usuario, password):
+   
+    query = text("""
+        SELECT usuario, rol
+        FROM herramientas.usuarios
+        WHERE usuario = :u AND contraseña = :p
+    """)
+    with engine4.connect() as conn:
+        result = conn.execute(query, {"u": usuario, "p": password}).fetchone()
+        return result  # result será None si no encuentra coincidencia

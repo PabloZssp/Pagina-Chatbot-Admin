@@ -1,15 +1,9 @@
 import streamlit as st
 import json as j  # Asegúrate de importar json correctamente
+import conexion2 as cn
 
 def log_in():
     st.set_page_config(page_title="Iniciar sesión", page_icon="🌎")
-
-    
-    if "usuario" in st.session_state:
-        st.success(f"Bienvenido, {st.session_state['usuario']} ")
-
-    with open("usuarios.json", "r") as f:
-        usuarios = j.load(f)
 
     st.title("Iniciar sesión")
 
@@ -17,11 +11,13 @@ def log_in():
     password = st.text_input("Contraseña", type="password")
 
     if st.button("Iniciar sesión"):
-        if usuario in usuarios and usuarios[usuario]["password"] == password:
-            st.session_state["usuario"] = usuario
-            st.session_state["rol"] = usuarios[usuario]["rol"]
+        user = cn.validar_usuario(usuario, password)
+        if user:
+            st.session_state["usuario"] = user[0]
+            st.session_state["rol"] = user[1]
+            st.success(f"Bienvenido {user[0]} ({user[1]})")
             st.switch_page("pages/Pagina_Principal.py")
-            st.rerun() 
+            st.rerun()
         else:
             st.error("Usuario o contraseña incorrectos")
 

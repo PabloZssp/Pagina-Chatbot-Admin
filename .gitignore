@@ -5,3 +5,4 @@ usuarios.json
 Dockerfile
 requirements.txt
 .dockerignore
+docker-compose.yml
