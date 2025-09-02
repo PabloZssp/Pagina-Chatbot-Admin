@@ -14,7 +14,7 @@ def MenuPrincipal():
             st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🤖")
             st.page_link("pages/Formularios.py", label="Componentes", icon="📝")
             #st.page_link("pages/MENU_BD.py", label="TEST")
-           #st.page_link("pages/Chatbot.py", label="Gráficas", icon="📊")
+            st.page_link("pages/Chatbot.py", label="Gráficas", icon="📊")
             #st.page_link("pages/log.py", label="login")
          else:
             st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🤖")

@@ -1,5 +1,4 @@
 import streamlit as st
-import json as j  # Asegúrate de importar json correctamente
 import conexion2 as cn
 
 def log_in():
@@ -9,13 +8,13 @@ def log_in():
 
     usuario = st.text_input("Usuario")
     password = st.text_input("Contraseña", type="password")
+    clave_privada = st.file_uploader("Sube tu clave privada SSH", type=["pem", "key", "txt"])
 
     if st.button("Iniciar sesión"):
         user = cn.validar_usuario(usuario, password)
         if user:
             st.session_state["usuario"] = user[0]
             st.session_state["rol"] = user[1]
-            st.success(f"Bienvenido {user[0]} ({user[1]})")
             st.switch_page("pages/Pagina_Principal.py")
             st.rerun()
         else:

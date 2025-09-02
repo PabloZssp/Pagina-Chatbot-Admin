@@ -236,7 +236,7 @@ def obtener_eventos3(tabla):
     campos_id = {
         'Arte_publico_monumentos': 'id_monumento',
         'Bibliotecas_archivos':'id_biblioteca',
-        'Barrios_colonias': 'id_barrios',
+        'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
         'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
@@ -274,7 +274,7 @@ def editar_campo3(t_seleccion):
     campos_id = {
         'Arte_publico_monumentos': 'id_monumento',
         'Bibliotecas_archivos':'id_biblioteca',
-        'Barrios_colonias': 'id_barrios',
+        'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
         'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
@@ -336,7 +336,7 @@ def obtener_registro_id3(id_evento, t_Select, campos):
     campos_id = {
         'Arte_publico_monumentos': 'id_monumento',
         'Bibliotecas_archivos': 'id_biblioteca',
-        'Barrios_colonias': 'id_barrios',
+        'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
         'Edificios_historicos': 'id_edificio',
         'Embajadas': 'id_embajada',
@@ -381,7 +381,7 @@ def actualizar_registro3(tabla, id_registro, nuevos_valores):
     campos_id = {
         'Arte_publico_monumentos': 'id_monumento',
         'Bibliotecas_archivos': 'id_biblioteca',
-        'Barrios_colonias': 'id_barrios',
+        'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
         'Edificios_historicos': 'id_edificio',
         'Embajadas': 'id_embajada',
@@ -455,7 +455,7 @@ def eliminar_campo3(tabla, id):
     campos_id = {
         'Arte_publico_monumentos': 'id_monumento',
         'Bibliotecas_archivos': 'id_biblioteca',
-        'Barrios_colonias': 'id_barrios',
+        'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
         'Edificios_historicos': 'id_edificio',
         'Embajadas': 'id_embajada',
