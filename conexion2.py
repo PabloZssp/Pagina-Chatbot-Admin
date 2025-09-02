@@ -2,6 +2,7 @@ from sqlalchemy import create_engine,text
 from dotenv import load_dotenv
 import os
 
+
 # Cargar variables del archivo .env
 load_dotenv()
 
@@ -542,4 +543,17 @@ def validar_usuario(usuario, password):
     """)
     with engine4.connect() as conn:
         result = conn.execute(query, {"u": usuario, "p": password}).fetchone()
-        return result  # result será None si no encuentra coincidencia
+        return result  
+
+def obtener_llave_publica(usuario):
+    query = text("""
+        SELECT ssh_key_publica
+        FROM herramientas.usuarios
+        WHERE usuario = :u
+    """)
+    with engine4.connect() as conn:
+        result = conn.execute(query, {"u": usuario}).fetchone()
+        if result and result[0]:
+            return result[0].encode() if isinstance(result[0], str) else result[0]
+        else:
+            return None

@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
-import Herramientas as h  # Módulo de herramientas para links de las páginas
-import Conexion as cnx # Módulo para la conexion de bases de datos de pruebas
+import Herramientas as h  
+import Conexion as cnx 
 import conexion2 as cn
 import log
 

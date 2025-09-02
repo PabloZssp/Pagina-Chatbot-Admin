@@ -1,11 +1,4 @@
-######
-# Pagina_Principal.py  
-# El arcvhio Formularios.py se cabiara el nomebre a Formularios.py
-# Por el momento lo dejaremos asi para cuestiones de una Version alfa
-######
-# Este archivo es la pagina principal del chatbot admin
-# Este por el momento se utilizara para hacer un menu princial 
-# Despues veremos de que manera implemetar mas cosas
+
 import streamlit as st
 import Herramientas as h #modulo de herramientas para links de las paginas
 import log 

@@ -1,5 +1,5 @@
 import streamlit as st
-import Herramientas as h #modulo de herramientas para links de las paginas
+import Herramientas as h 
 import log
 
 log.log_in()

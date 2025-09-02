@@ -73,7 +73,7 @@ def crear2(baseD):
     elif baseD=="chatbot_turismo":
          tabla = cn.obtener_tablas3()
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos3(slect_t)     # obtiene los datos de la tabla
+         campos =cn.obtener_campos3(slect_t)     
     else:
         st.text("seleciona una base de datos valida")
    
