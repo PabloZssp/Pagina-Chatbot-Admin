@@ -13,10 +13,13 @@ import Herramientas as h #modulo de herramientas para links de las paginas
 st.set_page_config(page_title="Pagina principal", initial_sidebar_state="auto",page_icon="🤖", layout="wide")
 
 h.st_normal().title(" ChatBot Admin ") #se define el estilo de columnas en h
+st.write("")
+st.divider()
+st.write("")
 st.subheader("Bienvenido al Chatbot Admin, aqui podrás seleccionar los aspectos que desees administrar dentro del chatbot.")
 
 with st.container():
- st.markdown(
+    st.markdown(
         """
         <div style="padding-top:4rem; font-size:18px;">
         """,

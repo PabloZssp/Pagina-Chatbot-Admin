@@ -11,6 +11,13 @@ def BasesDatos():
     st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬", layout="wide")
     
     h.st_normal().title("Componentes")
+    with st.container():
+        st.markdown(
+        """
+        <div style="padding-top:2rem; font-size:18px;">
+        """,
+        unsafe_allow_html=True
+    )
 
     
     # Aquí puedes agregar más opciones en la barra lateral si es necesario
@@ -20,7 +27,8 @@ def BasesDatos():
     
     
 
-    eleccion=h.st_normal().selectbox("Selecciona una opción",options=Menu, index=0)
+    eleccion=h.st_normal().selectbox("Selecciona el formulario",options=Menu, index=0)
+    st.write("")
 
     #A partir de aqui vamos a poner la mayoria de las opciones que tendra la pagina
     #como los botones para los formularios ya sea para los markdowns o para una base de datos
@@ -64,8 +72,9 @@ def crear_tabla_eventos():
 # Esta la usaremos para modificar las opciones de los formularios
 def opciones(entrada):
     Menu_Sec = ["Leer","Crear" , "Eliminar"]
-    st.subheader(f"Formulario {entrada}")
-    opcion = st.selectbox("Selecciona una opción", options=Menu_Sec, index=0)
+    st.markdown(f'<div class="hd-formulario" style="padding-bottom:1.5rem;">Estás seleccionando el formulario <span style="font-style:italic;font-weight: bold;color:black;">{entrada}</span></div>', unsafe_allow_html=True)
+    opcion =h.st_normal().selectbox("Selecciona lo que deseas hacer", options=Menu_Sec, index=0)
+    st.write("")
 
     if opcion == "Crear":
         crear(entrada)
@@ -76,129 +85,143 @@ def opciones(entrada):
 
 
 
-
-@st.dialog("Crear",width="large")
+@st.dialog("Crear registro", width="large")
 def crear(entrada):
+    Opt_M = [
+        " ", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ]
 
-    Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-  
+    st.markdown(
+        f"""
+        <div class="hd-modal">
+            Introduce la información para el nuevo registro en: <br> 
+            <span style="font-style:italic;font-weight: bold;color:darkslategray;">{entrada}</span>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-    st.subheader("Crear un nuevo registro")
-    col1, col2, col3, col4 = st.columns([2,3,2,3])
-    if entrada == "Base de datos":
-        st.dialog("inserte los campos")
-        with col1:
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Tabla:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Titulo:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Recinto:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Dirección:**")
-            st.markdown("<br>", unsafe_allow_html=True)
+    st.write("")
+    if entrada == "Base de datos": #alineamos en filas para que estén alineados, en lugar de alinear por columna unicamente.
+        # Fila 1
+        fila1 = st.columns(2)
+        with fila1[0]:
+            tabla = st.selectbox("Tabla", [" ", "Eventos", "Actividades", "Cursos", "Talleres"])
+        with fila1[1]:
+            title_text = st.text_input("Título")
+
+        # Fila 2
+        fila2 = st.columns(2)
+        with fila2[0]:
+            category_text = st.text_input("Categoría")
+        with fila2[1]:
+            cost_text = st.text_input("Costo")
+
+        # Fila 3
+        fila3 = st.columns(2)
+        with fila3[0]:
+            building_name_text = st.text_input("Recinto")
+        with fila3[1]:
+            address_text = st.text_input("Dirección")
+
+        # Fila 4
+        fila4 = st.columns(2)
+        with fila4[0]:
+            month_text = st.selectbox("Mes", Opt_M)
+        with fila4[1]:
+            dates_text = st.text_input("Fechas", placeholder="YYYY/MM/DD")
             
-            st.subheader("**Mes:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Fechas:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-                        
-        
 
-        with col2:
-            tabla = st.selectbox("", options=[" ","Eventos", "Actividades", "Cursos", "Talleres"], index=0)  # Nombre de la tabla
-            title_text = st.text_input(" ")
-            building_name_text = st.text_input("   ")
-            address_text = st.text_input("    ")
-            month_text = st.selectbox("", options=Opt_M, index=0)       
-            dates_text = st.text_input("      ", placeholder="YYYY/MM/DD ")
-            
+        # Fila 5
+        fila5 = st.columns(2)
+        with fila5[0]:
+            hora_text = st.text_input("Hora")
+        with fila5[1]:
+            duracion_text = st.text_input("Duración")
 
-        with col3:
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Hora:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Duración:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Categoría:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Costo:**") 
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**URL:**")
-    
-        with col4:
-            hora_text = st.text_input("         ")
-            duracion_text = st.text_input("                 ")
-            category_text = st.text_input("          ")
-            cost_text = st.text_input("              ")
-            url = st.text_input("            ")
+        # Fila 6
+        fila6 = st.columns(2)
+        with fila6[0]:
+            url = st.text_input("URL")
+        with fila6[1]:
+            description_text = st.text_area(
+                "Descripción",
+                height=100,
+                placeholder="Escribe aquí la descripción del evento o actividad..."
+            )
 
-
-        st.subheader("**Descripción:**")
-        description_text = st.text_area(" ", height=300, placeholder="Escribe aquí la descripción del evento o actividad...")
-        
+        # Botón
         if st.button("Guardar registro"):
+            
             try:
-                cnx.Crear_registro(tabla,title_text,building_name_text,address_text,month_text,dates_text,hora_text,duracion_text,category_text,cost_text,url, description_text)
+                cnx.Crear_registro(
+                    tabla, title_text, building_name_text, address_text,
+                    month_text, dates_text, hora_text, duracion_text,
+                    category_text, cost_text, url, description_text
+                )
+                st.write("")
                 st.success("Registro guardado exitosamente")
             except Exception as e:
-                st.error(f" Error al guardar el registro: {e}")
+                st.error(f"Error al guardar el registro: {e}")
+
 
 
         
 
-            # Aquí puedes agregar el código para guardar el registro en la base de datos
-           
+# Aquí puedes agregar el código para guardar el registro en la base de datos
+
 #########################################################
 ####################Markdowns############################
 #########################################################
     if entrada == "Markdown":
-        with col1:
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Titulo:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Recinto:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Dirección:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Mes:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Fechas:**")
-            st.markdown("<br>", unsafe_allow_html=True)  
+    # Fila 1
+        fila1 = st.columns(2)
+    with fila1[0]:
+        title = st.text_input("Título")
+    with fila1[1]:
+        category = st.text_input("Categoría")
 
-        with col2:
-            title = st.text_input(" ")
-            building_name = st.text_input("   ")
-            address = st.text_input("    ")
-            month = st.selectbox("", options=Opt_M, index=0)       
-            dates = st.text_input("      ", placeholder="YYYY/MM/DD ")
-            
+    # Fila 2
+    fila2 = st.columns(2)
+    with fila2[0]:
+        building_name = st.text_input("Recinto")
+    with fila2[1]:
+        cost = st.text_input("Costo")
 
-        with col3:
-            st.markdown("<br>", unsafe_allow_html=True) 
-            st.subheader("**Hora:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            st.subheader("**Categoría:**")
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**Costo:**") 
-            st.markdown("<br>", unsafe_allow_html=True)
-            st.subheader("**URL:**")
+    # Fila 3
+    fila3 = st.columns(2)
+    with fila3[0]:
+        address = st.text_input("Dirección")
+    with fila3[1]:
+        url = st.text_input("URL")
+
+    # Fila 4
+    fila4 = st.columns(2)
+    with fila4[0]:
+        month = st.selectbox("Mes", options=Opt_M, index=0)
+    with fila4[1]:
+        hour = st.text_input("Hora")
+
+    # Fila 5
+    fila5 = st.columns(2)
+    with fila5[0]:
+        dates = st.text_input("Fechas", placeholder="YYYY/MM/DD")
+    with fila5[1]:
+        st.empty()  # Para balancear columnas si no hay campo
+
+    # Descripción ocupa todo el ancho
+    description = st.text_area(
+        "Descripción",
+        height=200,
+        placeholder="Escribe aquí la descripción del evento o actividad..."
+    )
+
+    # Botón de guardado
+    if st.button("Guardar Markdown"):
+        st.write("")
+        st.success("Registro guardado exitosamente")
     
-        with col4:
-            hour = st.text_input("         ")
-            category = st.text_input("          ")
-            cost = st.text_input("              ")
-            url = st.text_input("            ")
-
-
-        st.subheader("**Descripción:**")
-        description = st.text_area(" ", height=300, placeholder="Escribe aquí la descripción del evento o actividad...")
-        if st.button("Guardar "):
-           st.success("Markdown Guardado")    
 
 
 
@@ -210,10 +233,10 @@ def selec_comp(Select):
             df_eventos = pd.DataFrame(eventos, columns=[
                 "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
                 "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
-            ])
+            ]).set_index("ID")
             st.subheader(" Registros guardados")
             st.dataframe(df_eventos)
-            st.markdown(h.tabla_Format,unsafe_allow_html=True)
+            
     
     elif Select == "actividades" :
         actividades =cnx.obtener_Actividades()
@@ -222,8 +245,9 @@ def selec_comp(Select):
             df_activ =pd.DataFrame(actividades,columns=[
                 "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
                 "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
-            ])
-            st.header("Registros Actividades Guardados")
+            ]).set_index("ID")
+            st.subheader("Registros Actividades Guardados")
+            st.divider()
             st.dataframe(df_activ)
 
     elif Select== "cursos":
@@ -234,8 +258,9 @@ def selec_comp(Select):
             df_activ =pd.DataFrame(actividades,columns=[
                 "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
                 "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
-            ])
-            st.header("Registros Actividades Guardados")
+            ]).set_index("ID")
+            st.subheader("Registros Actividades Guardados")
+            st.divider()
             st.dataframe(df_activ)
 
     elif Select == "talleres":
@@ -245,25 +270,33 @@ def selec_comp(Select):
             df_activ =pd.DataFrame(actividades,columns=[
                 "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
                 "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
-            ])
-            st.header("Registros Actividades Guardados")
+            ]).set_index("ID")
+            st.subheader("Registros Actividades Guardados")
+            st.divider()
             st.dataframe(df_activ)
 
     elif Select == "alcaldias_faq":
         alcaldias = cn.obtener_eventos(Select)
         if alcaldias:
-            df_alca = pd.DataFrame(alcaldias, columns=["id", "title", "category", "pregunta", "respuesta"])
+            df_alca = pd.DataFrame(alcaldias, columns=["id", "title", "category", "pregunta", "respuesta"]).set_index("ID")
             st.header("registros")
             st.dataframe(df_alca)
 
 
-@st.dialog("Modificar")
+@st.dialog("Modificar", width="large")
 def modificar(T_select):
     
     
     Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 
-    st.write("Selecciona el campo a modificar")
+    st.markdown(
+        f"""
+        <div class="hd-modal">
+            Selecciona el elemento a modificar <br> 
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
     ids = cnx.editar_campo(T_select)
     id_seleccionado = st.selectbox("Selecciona un ID", ids)
@@ -272,22 +305,22 @@ def modificar(T_select):
     registro = cnx.obtener_registro_id(id_seleccionado, T_select)
     c1,c2 = st.columns([5,5])
     if registro:
-         with c1:
-          Titulo = st.text_input("Titulo", value=registro[0])
-          Recinto= st.text_input("Recinto", value=registro[1])
-          Direccion = st.text_input("Direccion", value =registro[2])
-          Mes = st.selectbox("Mes", options=Opt_M, index=Opt_M.index(registro[3]))
-          Fechas= st.text_input("Fechas",value=registro[4] )
-         
-         with c2:
-          Hora= st.text_input("Hora",value=registro[5])
-          Duracion = st.text_input("Duracion", value=registro[6])
-          Categoria = st.text_input("Categoria", value=registro[8])
-          Costo= st.text_input("Costo",value=registro[9])
-          Url= st.text_input("URL",value=registro[10])
-          
-         Descripcion = st.text_area("Descripción", height=300 ,  value=registro[7])
-         G_b =st.button("Guardar cambios")
+        with c1:
+            Titulo = st.text_input("Titulo", value=registro[0])
+            Recinto= st.text_input("Recinto", value=registro[1])
+            Direccion = st.text_input("Direccion", value =registro[2])
+            Mes = st.selectbox("Mes", options=Opt_M, index=Opt_M.index(registro[3]))
+            Fechas= st.text_input("Fechas",value=registro[4] )
+
+        with c2:
+            Hora= st.text_input("Hora",value=registro[5])
+            Duracion = st.text_input("Duracion", value=registro[6])
+            Categoria = st.text_input("Categoria", value=registro[8])
+            Costo= st.text_input("Costo",value=registro[9])
+            Url= st.text_input("URL",value=registro[10])
+
+        Descripcion = st.text_area("Descripción", height=100 ,  value=registro[7])
+        G_b =st.button("Guardar cambios")
         
     if G_b:
             cnx.actualizar_registro(T_select,id_seleccionado, Titulo, Recinto, Direccion, Mes, Fechas, Hora, Duracion, Descripcion, Categoria, Costo, Url)
@@ -300,15 +333,14 @@ def modificar(T_select):
 def leer(entrada):
 
     if entrada == "Base de datos":
-       
-       st.subheader("Leer registros")
-       diccionario_tablas = cnx.obtener_tablas()
-       tablas = st.selectbox("Selecciona una tabla", options=list(diccionario_tablas.values()))
-       selec_comp(tablas)
-       edit_b = st.button("Editar")
-       if edit_b:
+        st.markdown('<div class="hd-formulario" style="padding-bottom:1.5rem;">Estás seleccionando <span style="font-style:italic;font-weight: bold;color:black;">Leer registros</span></div>', unsafe_allow_html=True)
+        diccionario_tablas = cnx.obtener_tablas()
+        tablas = h.st_normal().selectbox("Selecciona una tabla", options=list(diccionario_tablas.values()))
+        selec_comp(tablas)
+        edit_b = st.button("Editar")
+        if edit_b:
             try:
-                 modificar(tablas)
+                modificar(tablas)
             except Exception as e:
                 st.error(f"Ocurrió un error al editar el evento: {e}")
     
@@ -319,139 +351,186 @@ def leer(entrada):
 
 
 ##########################################################################
+##################### FUNCION ELIMINAR ###################################
 ##########################################################################
     
 @st.dialog("Eliminar",width="large")
 def eliminar(entrada):
-    st.subheader("Eliminar un registro existente")
-   
-
+    st.markdown(
+        """
+        <div class="hd-modal" style="padding-bottom:1.5rem;">
+            Eliminar un registro existente
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     if entrada == "Base de datos":
         
         diccionario_tablas = cnx.obtener_tablas()
-        tablas = st.selectbox("Selecciona una tabla", options=list(diccionario_tablas.values()))
-        
+        tablas =h.st_modal().selectbox("Selecciona una tabla", options=list(diccionario_tablas.values()))
+        st.write("")
         if tablas == "eventos":   
-             eventos = cnx.obtener_eventos()
+            eventos = cnx.obtener_eventos()
 
-             if eventos:
-                 df_eventos = pd.DataFrame(eventos, columns=[
-                     "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
-                       "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
-                   ])
-                 st.subheader(" Registros guardados")
-                 st.dataframe(df_eventos, use_container_width=True)
-             st.write("Selecciona el campo a Eliminar")
-             c1,c2 = st.columns([5,5])
-             ids = cnx.editar_campo(tablas)
-             with c1:
-              id_seleccionado = st.selectbox("Selecciona un ID", ids) 
-              registro=cnx.obtener_registro_id(id_seleccionado, tablas)
-             with c2:
-                
-                st.text(f"Título: {registro[0]}")
-                st.text(f"Recinto: {registro[1]}")
-                st.text(f"Dirección: {registro[2]}")
-
+            if eventos:
+                df_eventos = pd.DataFrame(eventos, columns=[
+                    "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
+                    "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
+                ]).set_index("ID")
+                st.subheader(" Registros guardados")
+                st.write("")
+                st.dataframe(df_eventos, use_container_width=True)
+            st.subheader("Selecciona el campo a Eliminar")
+            st.write("")
+            c1,c2,c3,c4 = st.columns([1,2,1,7])
+            ids = cnx.editar_campo(tablas)
+            with c1:
+                st.empty()
+            with c2:
+                id_seleccionado = st.selectbox("Selecciona un ID", ids) 
+                registro=cnx.obtener_registro_id(id_seleccionado, tablas)
+            with c3:
+                st.empty()
+            with c4:
+                st.markdown(
+        f"""
+        <div style="text-align: left;">
+            <p><b>Título:</b> {registro[0]}</p>
+            <p><b>Recinto:</b> {registro[1]}</p>
+            <p><b>Dirección:</b> {registro[2]}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
             
-             B_El = st.button(" Eliminar registro")
+            B_El = st.button(" Eliminar registro")
 
-             if B_El:
+            if B_El:
                 cnx.eliminar_registro(tablas,id_seleccionado)
                 st.success(f"Se elimino el registro {registro[0]} exitosamente")
-             
-                     
+
+
 ###############################################
         elif tablas == "actividades":
-             eventos = cnx.obtener_Actividades()
+            eventos = cnx.obtener_Actividades()
 
-             if eventos:
-                 df_actividades = pd.DataFrame(eventos, columns=[
-                     "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
-                       "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
-                   ])
-                 st.subheader(" Registros guardados")
-                 st.dataframe(df_actividades, use_container_width=True)
-             st.write("Selecciona el campo a Eliminar")
-             c1,c2 = st.columns([5,5])
-             ids = cnx.editar_campo(tablas)
-             with c1:
-              id_seleccionado = st.selectbox("Selecciona un ID", ids) 
-              registro=cnx.obtener_registro_id(id_seleccionado, tablas)
-             with c2:
-                
-                st.text(f"Título: {registro[0]}")
-                st.text(f"Recinto: {registro[1]}")
-                st.text(f"Dirección: {registro[2]}")
-
+            if eventos:
+                df_actividades = pd.DataFrame(eventos, columns=[
+                    "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
+                    "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
+                ]).set_index("ID")
+                st.subheader(" Registros guardados")
+                st.write("")
+                st.dataframe(df_actividades, use_container_width=True)
+            st.subheader("Selecciona el campo a Eliminar")
+            c1,c2,c3,c4 = st.columns([1,2,1,7])
+            ids = cnx.editar_campo(tablas)
+            with c1:
+                st.empty()
+            with c2:
+                id_seleccionado = st.selectbox("Selecciona un ID", ids) 
+            registro=cnx.obtener_registro_id(id_seleccionado, tablas)
+            with c3:
+                st.empty()
+            with c4:
+                st.markdown(
+        f"""
+        <div style="text-align: left;">
+            <p><b>Título:</b> {registro[0]}</p>
+            <p><b>Recinto:</b> {registro[1]}</p>
+            <p><b>Dirección:</b> {registro[2]}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
             
-             B_El = st.button(" Eliminar registro")
+            B_El = st.button(" Eliminar registro")
 
-             if B_El:
+            if B_El:
                 cnx.eliminar_registro(tablas,id_seleccionado)
                 st.success(f"Se elimino el registro {registro[0]} exitosamente")
 ###############################################
         elif tablas == "cursos":
-             eventos = cnx.obtenerCursos()
+            eventos = cnx.obtenerCursos()
 
-             if eventos:
-                 df_cursos = pd.DataFrame(eventos, columns=[
-                     "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
-                       "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
-                   ])
-                 st.subheader(" Registros guardados")
-                 st.dataframe(df_cursos, use_container_width=True)
-             st.write("Selecciona el campo a Eliminar")
-             c1,c2 = st.columns([5,5])
-             ids = cnx.editar_campo(tablas)
-             with c1:
-              id_seleccionado = st.selectbox("Selecciona un ID", ids) 
-              registro=cnx.obtener_registro_id(id_seleccionado, tablas)
-             with c2:
-                
-                st.text(f"Título: {registro[0]}")
-                st.text(f"Recinto: {registro[1]}")
-                st.text(f"Dirección: {registro[2]}")
-
+            if eventos:
+                df_cursos = pd.DataFrame(eventos, columns=[
+                    "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
+                    "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
+                ]).set_index("ID")
+                st.subheader(" Registros guardados")
+                st.write("")
+                st.dataframe(df_cursos, use_container_width=True)
+            st.subheader("Selecciona el campo a Eliminar")
+            c1,c2,c3,c4 = st.columns([1,2,1,7])
+            ids = cnx.editar_campo(tablas)
+            with c1:
+                st.empty()
+            with c2:
+                id_seleccionado = st.selectbox("Selecciona un ID", ids) 
+            registro=cnx.obtener_registro_id(id_seleccionado, tablas)
+            with c3:
+                st.empty()
+            with c4:
+                st.markdown(
+        f"""
+        <div style="text-align: left;">
+            <p><b>Título:</b> {registro[0]}</p>
+            <p><b>Recinto:</b> {registro[1]}</p>
+            <p><b>Dirección:</b> {registro[2]}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
             
-             B_El = st.button(" Eliminar registro")
+            B_El = st.button(" Eliminar registro")
 
-             if B_El:
+            if B_El:
                 cnx.eliminar_registro(tablas,id_seleccionado)
                 st.success(f"Se elimino el registro {registro[0]} exitosamente")
 ################################################
         elif tablas == "talleres":
-             eventos = cnx.obtener_Talleres()
-             if eventos:
-                 df_talleres = pd.DataFrame(eventos, columns=[
-                     "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
-                       "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
-                   ])
-                 st.subheader(" Registros guardados")
-                 st.dataframe(df_talleres, use_container_width=True)
-             st.write("Selecciona el campo a Eliminar")
-             c1,c2 = st.columns([5,5])
-             ids = cnx.editar_campo(tablas)
-             with c1:
-              id_seleccionado = st.selectbox("Selecciona un ID", ids) 
-              registro=cnx.obtener_registro_id(id_seleccionado, tablas)
-             with c2:
-                
-                st.text(f"Título: {registro[0]}")
-                st.text(f"Recinto: {registro[1]}")
-                st.text(f"Dirección: {registro[2]}")
-                
-            
-             B_El = st.button(" Eliminar registro")
+            eventos = cnx.obtener_Talleres()
+            if eventos:
+                df_talleres = pd.DataFrame(eventos, columns=[
+                    "ID", "Título", "Recinto", "Dirección", "Mes", "Fechas",
+                    "Hora", "Duración", "Categoría", "Costo", "URL", "Descripción"
+                ]).set_index("ID")
+                st.subheader(" Registros guardados")
+                st.write("")
+                st.dataframe(df_talleres, use_container_width=True)
+            st.subheader("Selecciona el campo a Eliminar")
+            c1,c2,c3,c4 = st.columns([1,2,1,7])
+            ids = cnx.editar_campo(tablas)
+            with c1:
+                st.empty()
+            with c2:
+                id_seleccionado = st.selectbox("Selecciona un ID", ids) 
+            registro=cnx.obtener_registro_id(id_seleccionado, tablas)
+            with c3:
+                st.empty()
+            with c4:
+                st.markdown(
+        f"""
+        <div style="text-align: left;">
+            <p><b>Título:</b> {registro[0]}</p>
+            <p><b>Recinto:</b> {registro[1]}</p>
+            <p><b>Dirección:</b> {registro[2]}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-             if B_El:
+            
+            B_El = st.button(" Eliminar registro")
+
+            if B_El:
                 cnx.eliminar_registro(tablas,id_seleccionado)
                 st.success(f"Se elimino el registro {registro[0]} exitosamente")
         
 
     if entrada == "Markdown":
-       tablas= st.selectbox("Selecciona el Markdown", options= ["", "mRK1","Mrk2"], index = 0)
-
+        tablas= st.selectbox("Selecciona el Markdown", options= ["", "mRK1","Mrk2"], index = 0)
 
 BasesDatos()
 

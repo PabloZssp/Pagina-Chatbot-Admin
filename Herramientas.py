@@ -3,17 +3,23 @@ from configparser import ConfigParser as cp
 from sqlmodel import create_engine
 
 
+#esto crea 3 columnas, dejando el contenido centrado
 def st_normal():
     _, col, _ = st.columns([1, 2, 1])
+    return col
+
+def st_modal():
+    _, col, _ = st.columns([1,3,1])
     return col
 
 def MenuPrincipal():
     
     with st.sidebar:
-         st.page_link("Pagina_Principal.py",label=" Página Principal",icon="🏠")
-         st.page_link("pages/Formularios.py",label=" Componentes",icon="📝")
-         st.page_link("pages/Chatbot.py",label=" Gráficas",icon="📊")
-         st.page_link("pages/MENU_BD.py",label= "TEST")
+        st.markdown('<div style="text-align: center; padding-bottom: 3rem;"><img src="https://picsum.photos/120"></div>',unsafe_allow_html=True)
+        st.page_link("Pagina_Principal.py",label=" Página Principal",icon="🏠")
+        st.page_link("pages/Formularios.py",label=" Componentes",icon="📝")
+        st.page_link("pages/Chatbot.py",label=" Gráficas",icon="📊")
+        st.page_link("pages/MENU_BD.py",label= "TEST")
 
 # Ejemplo de como aaceder  a las variables de la configuracion  de la conexion a la base de datos
 # en este caso se usara para crear la conexion a la base de datos
@@ -32,9 +38,63 @@ def MenuPrincipal():
 page_bg_img = """
 
 <style>
-[data-testid="stMain"] {
+/* SELECT BOX SECTION */
 
+/* Cambia el color de fondo de todos los selectbox en lightmode*/
+.stSelectbox > div[data-baseweb="select"] > div{
+background-color:#faf7f7 !important;
+border-radius: 5px;
+color: black;
 }
+
+/*color del dropdown del selectbox */
+.st-cy, .st-dn{
+background-color:#f5f2f2 !important;
+}
+
+/*color del texto dentro del dropdown*/
+.st-b6, .st-dj{
+color:#121112;
+}
+
+/*color del selectbox en modo oscuro*/
+.st-b7, .st-b8, .st-b9, .st-ba, .st-dp, .st-do, .st-dn, .st-dm {
+border-color: #bcbcbc;
+}
+
+/*color de bordes de selectbox active*/
+.st-cv, .st-cu, .st-ct, .st-cs{
+border-color: #bcbcbc;
+}
+
+/* Aplica estilo solo al label*/
+.stSelectbox label p, .stTextInput label p, .stTextArea label p {
+    color: #8b233f !important;
+    font-size: 1rem;  
+    font-weight: 500;   
+}
+
+
+/* clase para título de los selectbox*/
+.hd-formulario {
+    color: #8b233f;
+    font-weight: 400;
+}
+
+/* FIN SELECT BOX SECTION */
+
+/* INICIO MODALES */
+
+/* clase para título de los modales*/
+.hd-modal {
+    color: #8b233f;
+    font-weight: 400;
+    font-size:20px;
+}
+
+/* FIN MODALES */
+
+/* CONTENIDO CENTRAL EN EL BLOCK */
 
 [data-testid="stVerticalBlock"]{
 display: flex;
@@ -42,15 +102,27 @@ justify-content: center;
 align-items: center;
 flex-direction: column;
 text-align:center;
-padding-top:15px;
-padding-bottom:10px;
+padding-top:3px;
+padding-bottom:3px;
 }
 
-
-
 [data-testid="stAppViewContainer"] {
-background-color: #F8F9FA;
-background-size: cover;
+    position: relative; 
+    background-color: #f2f0f0;
+    overflow: hidden;
+}
+
+[data-testid="stAppViewContainer"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("https://previews.123rf.com/images/sunspire/sunspire1610/sunspire161000053/63825371-abstract-geometric-black-and-white-hipster-fashion-polygon-background-pattern.jpg");
+    background-size: contain;
+    background-position: center;
+    opacity: 0.03;
 }
 
 /* Solo los títulos del contenedor principal */
@@ -63,43 +135,28 @@ font-weight: 600 !important;
 }
 
 .stAppViewContainer h3{
-color: grey important;
-}
+color: #3c3c3c !important;
 
-button {
-padding: 1rem 2rem !important;
-background-color: #8b233f !important;
-}
-
-button p{
-font-weight:700 !important;
-color: white !important;
-font-size: 1.3rem !important;
-transform: scale(1) !important;
-}
-
-button:hover{
-box-shadow: 3px 5px 3px rgba(0, 0, 0, 0.2) !important;
-transform: scale(0.9) !important;
-transition: box-shadow 0.3s ease-in-out !important;
-transition: all 500ms !important; 
-}
-
-[data-testid="stWidgetLabel"] {
-color: #848889 !important;
 }
 
 [data-testid="stElementContainer"]{
 text-align: center;
-
 }
 
 [data-testid="stHeader"] {
 background-color: #8b233f;
 color: white;
-
 }
 
+/* FIN CONTENIDO CENTRAL EN EL BLOCK */
+
+
+/* CONTENIDO SIDEBAR */
+
+/* icono de la sidebar minimizada*/
+[data-testid="stExpandSidebarButton"] span{
+color:white;
+}
 
 [data-testid="stSidebar"] {
     background: linear-gradient(to bottom, #8b233f, #b34d66);
@@ -112,34 +169,31 @@ color: white;
     color: white !important;
 }
 
-</style>
-"""
+/* FIN CONTENIDO SIDEBAR */
 
 
-tabla_Format= """
-<style>
-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th {
-        background-color: #000000;
-        color: white;
-        padding: 8px;
-        border: 1px solid #444;
-    }
-    td {
-        background-color: #111111;
-        color: white;
-        padding: 8px;
-        border: 1px solid #444;
-    }
-    tr:nth-child(even) td {
-        background-color: #222222;
-    }
-    a {
-        color: #1E90FF;
-    }
+/* BOTONES */
+
+button {
+# padding: 0.5rem 1rem !important;
+background-color: #8b233f !important;
+color:white !important;
+}
+
+button p{
+font-weight:700 !important;
+color: white !important;
+font-size: 1.1rem !important;
+}
+
+button:hover{
+transform: scale(0.9) !important;
+transition: all 500ms !important; 
+background-color: #9c2c4a !important;
+}
+
+/* FIN BOTONES */
+
 
 </style>
 """
