@@ -1,8 +1,12 @@
 import streamlit as st
 import pandas as pd
-import Herramientas as h  # Módulo de herramientas para links de las páginas
-import Conexion as cnx # Módulo para la conexion de bases de datos de pruebas
+import Herramientas as h  
+import Conexion as cnx 
 import conexion2 as cn
+import log
+
+h.verificar_sesion()
+h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
 
 def menu_BD():
@@ -11,10 +15,19 @@ def menu_BD():
     st.markdown(h.page_bg_img, unsafe_allow_html=True)
     st.title("Bases de datos")
     
-    Menu =[" ","eventos_cartelera","informacion_ux","chatbot_turismo","test"]
     
+    rol = log.obtener_rol_actual()
+    
+    if rol == "administrador":
+        Menu =[" ","eventos_cartelera","informacion_ux","chatbot_turismo","test"]
+    elif rol== "usuarioUX":
+        Menu =[" ","informacion_ux",]
+    elif rol== "usuarioCl":
+        Menu =[" ","eventos_cartelera"]
+    elif rol== "usuarioTU":
+        Menu =[" ","chatbot_turismo"]
+   
     Bdatos=st.selectbox("Selecciona una Base de datos:",options=Menu)
-
 
     if Bdatos == "informacion_ux":
         
@@ -30,8 +43,7 @@ def menu_BD():
 
     elif Bdatos == "test":        
         opciones2(Bdatos)
-
-        
+               
     
 def opciones(tabla,campos,Bdatos):
 
@@ -209,9 +221,9 @@ def crear2(baseD):
          campos =cn.obtener_campos2(slect_t)
     
     elif baseD=="chatbot_turismo":
-         tabla = cn.obtener_tablas2()
+         tabla = cn.obtener_tablas3()
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos2(slect_t)     # obtiene los datos de la tabla
+         campos =cn.obtener_campos3(slect_t)     # obtiene los datos de la tabla
     else:
         st.text("seleciona una base de datos valida")
    
@@ -223,14 +235,15 @@ def crear2(baseD):
     indice = 0  
     
     for  campo in campos:
-        if campo.lower() == "id":
+        if campo.lower() == "id"or campo.lower().startswith("id_"):
+
             continue
         with col1 if indice % 2 == 0 else col2:
             if "fecha" in campo.lower():
                 valores[campo] = st.date_input(f"**{campo}:**")
             elif "dates" in campo.lower():
                 valores[campo] =st.date_input(f"{campo}:")
-            elif "mes" in campo.lower():
+            elif "month"  in campo.lower():
                 valores[campo] = st.selectbox(f"{campo}:", options=Opt_M)
             elif "descripcion"  in campo.lower():
                 valores[campo] =st.text_area(f"{campo}:",height=100,placeholder="Escribe aqui tu descrpcion:")
@@ -251,7 +264,7 @@ def crear2(baseD):
                  cn.crear_registro(slect_t, valores)
                  st.success("Registro guardado exitosamente")
             elif baseD=="chatbot_turismo":
-                 cn.crear_registro(slect_t, valores)
+                 cn.crear_registro3(slect_t, valores)
                  st.success("Registro guardado exitosamente")
             else:
                 st.error("seleciona una base de datos valida")
@@ -264,8 +277,8 @@ def crear2(baseD):
 def selec_comp2(tabla,basedatos):
    
     if basedatos=="test":
-        columnas = cnx.obtener_columnas(tabla)
-        registros= cnx.obtener_Actividades()
+        columnas = cn.obtener_campos4(tabla)
+        registros= cn.obtener_eventos4(tabla)
     elif basedatos=="informacion_ux":
         columnas = cn.obtener_campos(tabla)         # obtiene los nombres de las columnas
         registros = cn.obtener_eventos(tabla)        # obtiene los datos de la tabla
@@ -288,7 +301,7 @@ def leer2(basedatos):
        st.subheader(f"Leer registros de: {basedatos} ")
 
        if basedatos=="test":
-            diccionario_tablas = cnx.obtener_tablas()
+            diccionario_tablas = cn.obtener_tablas4()
        elif basedatos=="informacion_ux":
            diccionario_tablas= cn.obtener_tablas()
        elif basedatos=="eventos_cartelera":
@@ -333,11 +346,11 @@ def modificar2(t_elec,bdatos):
       registro= cn.obtener_registro_id2(id_seleccionado,t_elec,campos)
 
     elif bdatos=="chatbot_turismo":
-      campos =cn.obtener_campos(t_elec)
+      campos =cn.obtener_campos3(t_elec)
       st.write("Selecciona el campo a modificar")
-      ids = cn.editar_campo(t_elec)
+      ids = cn.editar_campo3(t_elec)
       id_seleccionado = st.selectbox("Selecciona un ID", ids)
-      registro= cn.obtener_registro_id2(id_seleccionado,t_elec,campos)
+      registro= cn.obtener_registro_id3(id_seleccionado,t_elec,campos)
 
     else:
         st.text("seleciona una base de datos valida")
@@ -353,13 +366,12 @@ def modificar2(t_elec,bdatos):
 
     for campo in campos:
         
-
         with col1 if valor_idx % 2 == 0 else col2:
             valor_actual = registro[valor_idx]
 
             if "fecha" in campo.lower() or "dates" in campo.lower():
                 valores[campo] = st.date_input(f"{campo}:", value=None)
-            elif "mes" in campo.lower():
+            elif "month" in campo.lower():
                 valores[campo] = st.selectbox(f"{campo}:", options=Opt_M, index=Opt_M.index(valor_actual) if valor_actual in Opt_M else 0)
             elif "descripcion" in campo.lower():
                 valores[campo] = st.text_area(f"{campo}:", value=valor_actual, height=100, placeholder="Escribe aquí tu descripción:")
@@ -371,6 +383,7 @@ def modificar2(t_elec,bdatos):
                 valores[campo] = st.text_input(f"{campo}:", value=valor_actual)
 
         valor_idx += 1
+    st.text(f"tabla: {t_elec}")    
     G_b= st.button("Guardar cambios")
     if G_b:
 
@@ -473,7 +486,7 @@ def eliminar2(Bdatos):
          elif Bdatos=="chatbot_turismo":
           
           st.text(f"ID: {registro[0]}")
-          st.text(f"Nombre: {registro[1]}")
+          st.text(f"Nombre/categoria: {registro[1]}")
           
    
     b_El = st.button("Eliminar registro")

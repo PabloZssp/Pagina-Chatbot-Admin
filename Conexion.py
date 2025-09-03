@@ -48,7 +48,7 @@ def obtener_columnas(nombre_tabla):
     conn = get_connection()
     cur = conn.cursor()
 
-    # Usar parámetros para evitar inyecciones SQL
+    
     consulta = """
         SELECT COLUMN_NAME
         FROM INFORMATION_SCHEMA.COLUMNS
@@ -58,7 +58,7 @@ def obtener_columnas(nombre_tabla):
     columnas = [row[0] for row in cur.fetchall()]
     conn.close()
 
-    # Crear diccionario con nombres como claves y valores iguales
+    
     diccionario = {col: col for col in columnas}
     return diccionario
 
