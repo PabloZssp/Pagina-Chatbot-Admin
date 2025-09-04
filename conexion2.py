@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine,text
 from dotenv import load_dotenv
 import os
-
+import tempfile
+from sshtunnel import SSHTunnelForwarder
 
 # Cargar variables del archivo .env
 load_dotenv()
@@ -557,3 +558,309 @@ def obtener_llave_publica(usuario):
             return result[0].encode() if isinstance(result[0], str) else result[0]
         else:
             return None
+        
+
+
+######################################
+#########Conexion con el tunelssh#####
+######################################
+
+SSH_HOST = os.getenv("SSH_SERVER")
+SSH_PORT = int(os.getenv("SSH_PORT"))
+SSH_USER = os.getenv("SSH_USER")
+SSH_PKEY = os.getenv("SSH_PKEY")
+SSH_PKEY_PASS = os.getenv("SSH_PKEY_PASS")
+
+DBS_USER = os.getenv("DBS_USER")
+DBS_PASSWORD = os.getenv("DBS_PASSWORD")
+DBS_NAME = os.getenv("DBS_NAMET")
+DBS_PORT = int(os.getenv("DBS_PORT"))
+DBS_HOST = os.getenv("DBS_HOST")
+DATABASE_S_URL = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAME}"
+engine5 = create_engine(DATABASE_S_URL)
+
+
+####################################
+################tunelssh############
+####################################
+
+def crear_tunel(clave_privada_bytes, clave_pass=None):
+    with tempfile.NamedTemporaryFile(delete=False) as temp_key:
+        temp_key.write(clave_privada_bytes)
+        temp_key_path = temp_key.name
+
+    server = SSHTunnelForwarder(
+        ssh_address_or_host=(SSH_HOST, SSH_PORT),
+        ssh_username=SSH_USER,
+        ssh_pkey=temp_key_path,
+        ssh_private_key_password=clave_pass,
+        remote_bind_address=(DBS_HOST, DBS_PORT),
+        local_bind_address=('localhost', 6543)
+    )
+    server.start()
+    return server
+
+
+
+###############################
+########Conexion BDS############
+###############################
+
+
+def obtener_eventos5(tabla):
+    campos_id = {
+        'Arte_publico_monumentos': 'id_monumento',
+        'Bibliotecas_archivos':'id_biblioteca',
+        'Barrios_colonias': 'id_barrio',
+        'Centros_culturales': 'id_centro',
+        'Edificios_historicos':'id_edificio',
+        'Embajadas': 'id_embajada',
+        'Estaciones_de_metro': 'id_estacion',
+        'Galerias_de_arte':'id_galeria',
+        'Gran_aforo': 'id_aforo',
+        'Hoteles': 'id_hotel',
+        'Iglecias_catedrales':'id_iglecia',
+        'Ir_de_compras': 'id_plaza_comer',
+        'Mercados': 'id_mercado',
+        'Miradores':'id_mirador',
+        'Museos': 'id_museo',
+        'Parques_plazas_publicas': 'id_parque',
+        'Restaurantes':'id_rest',
+        'sitios_arqueologico': 'id_sitio',
+        'cat_hotel_estrellas': 'id_estrella',
+        'cat_restaurantes_estrellas':'id_estrella',
+        
+    }
+
+    nombre_id = campos_id.get(tabla)
+    if not nombre_id:
+        raise ValueError(f"No se encontró campo ID para la tabla '{tabla}'")
+
+    query = text(f'SELECT * FROM categorias."{tabla}" ORDER BY {nombre_id} ASC')
+
+    with engine5.connect() as conn:
+        result = conn.execute(query)
+        rows = result.fetchall()
+
+    return rows
+
+
+def editar_campo5(t_seleccion):
+    campos_id = {
+        'Arte_publico_monumentos': 'id_monumento',
+        'Bibliotecas_archivos':'id_biblioteca',
+        'Barrios_colonias': 'id_barrio',
+        'Centros_culturales': 'id_centro',
+        'Edificios_historicos':'id_edificio',
+        'Embajadas': 'id_embajada',
+        'Estaciones_de_metro': 'id_estacion',
+        'Galerias_de_arte':'id_galeria',
+        'Gran_aforo': 'id_aforo',
+        'Hoteles': 'id_hotel',
+        'Iglecias_catedrales':'id_iglecia',
+        'Ir_de_compras': 'id_plaza_comer',
+        'Mercados': 'id_mercado',
+        'Miradores':'id_mirador',
+        'Museos': 'id_museo',
+        'Parques_plazas_publicas': 'id_parque',
+        'Restaurantes':'id_rest',
+        'sitios_arqueologico': 'id_sitio',
+        'cat_hotel_estrellas': 'id_estrella',
+        'cat_restaurantes_estrellas':'id_estrella',
+        
+    }
+
+    
+    campo_id = campos_id.get(t_seleccion)
+    if not campo_id:
+        raise ValueError(f"No se encontró campo ID para la tabla '{t_seleccion}'")
+
+    query = text(f'SELECT {campo_id} FROM categorias."{t_seleccion}" ORDER BY {campo_id}')
+    with engine5.connect() as conn:
+        result = conn.execute(query)
+        ids = [row[0] for row in result.fetchall()]
+    return ids
+
+
+def crear_registro5(tabla, valores):
+    if not tabla or not valores:
+        raise ValueError("Tabla y valores no pueden estar vacíos.")
+
+    
+    tabla_sql = f'"{tabla}"' if not tabla.islower() else tabla
+
+    columnas = list(valores.keys())
+
+    
+    columnas_sql = ", ".join([f'"{col}"' for col in columnas])
+    placeholders = ", ".join([f":{col}" for col in columnas])
+
+    query = text(f"""
+        INSERT INTO categorias.{tabla_sql} ({columnas_sql})
+        VALUES ({placeholders})
+    """)
+
+    try:
+        with engine5.begin() as conn:
+            conn.execute(query, valores)
+    except Exception as e:
+        print(f" Error al insertar registro en '{tabla}': {e}")
+
+
+def obtener_registro_id5(id_evento, t_Select, campos):
+    campos_id = {
+        'Arte_publico_monumentos': 'id_monumento',
+        'Bibliotecas_archivos': 'id_biblioteca',
+        'Barrios_colonias': 'id_barrio',
+        'Centros_culturales': 'id_centro',
+        'Edificios_historicos': 'id_edificio',
+        'Embajadas': 'id_embajada',
+        'Estaciones_de_metro': 'id_estacion',
+        'Galerias_de_arte': 'id_galeria',
+        'Gran_aforo': 'id_aforo',
+        'Hoteles': 'id_hotel',
+        'Iglecias_catedrales': 'id_iglecia',
+        'Ir_de_compras': 'id_plaza_comer',
+        'Mercados': 'id_mercado',
+        'Miradores': 'id_mirador',
+        'Museos': 'id_museo',
+        'Parques_plazas_publicas': 'id_parque',
+        'Restaurantes': 'id_rest',
+        'sitios_arqueologico': 'id_sitio',
+        'cat_hotel_estrellas': 'id_estrella',
+        'cat_restaurantes_estrellas': 'id_estrella',
+    }
+
+    columna_id = campos_id.get(t_Select)
+    if not columna_id:
+        raise ValueError(f"No se encontró columna ID para la tabla '{t_Select}'")
+
+    
+    columnas_sql = ", ".join([f'"{col}"' if not col.islower() else col for col in campos])
+
+    query = text(f"""
+        SELECT {columnas_sql}
+        FROM categorias."{t_Select}"
+        WHERE {columna_id} = :id_evento
+    """)
+
+    with engine5.connect() as conn:
+        result = conn.execute(query, {"id_evento": id_evento})
+        evento = result.fetchone()
+
+    return evento
+
+
+
+def actualizar_registro5(tabla, id_registro, nuevos_valores):
+    campos_id = {
+        'Arte_publico_monumentos': 'id_monumento',
+        'Bibliotecas_archivos': 'id_biblioteca',
+        'Barrios_colonias': 'id_barrio',
+        'Centros_culturales': 'id_centro',
+        'Edificios_historicos': 'id_edificio',
+        'Embajadas': 'id_embajada',
+        'Estaciones_de_metro': 'id_estacion',
+        'Galerias_de_arte': 'id_galeria',
+        'Gran_aforo': 'id_aforo',
+        'Hoteles': 'id_hotel',
+        'Iglecias_catedrales': 'id_iglecia',
+        'Ir_de_compras': 'id_plaza_comer',
+        'Mercados': 'id_mercado',
+        'Miradores': 'id_mirador',
+        'Museos': 'id_museo',
+        'Parques_plazas_publicas': 'id_parque',
+        'Restaurantes': 'id_rest',
+        'sitios_arqueologico': 'id_sitio',
+        'cat_hotel_estrellas': 'id_estrella',
+        'cat_restaurantes_estrellas': 'id_estrella',
+    }
+
+    columna_id = campos_id.get(tabla)
+    if not columna_id:
+        raise ValueError(f"No se encontró columna ID para la tabla '{tabla}'")
+
+    
+    set_clause = ", ".join([f'"{campo}" = :{campo}' for campo in nuevos_valores])
+
+    query = text(f"""
+    UPDATE "categorias"."{tabla}"
+    SET {set_clause}
+    WHERE "{columna_id}" = :id_registro;
+      """)
+
+
+    params = {"id_registro": id_registro}
+    params.update(nuevos_valores)
+
+    with engine5.connect() as conn:
+        conn.execute(query, params)
+        conn.commit()
+
+
+def obtener_tablas5():
+    query = text("""
+        SELECT table_name
+        FROM information_schema.tables
+        WHERE table_schema = 'categorias'
+        ORDER BY table_name;
+    """)
+    with engine5.connect() as conn:
+        tablas = [row[0] for row in conn.execute(query)]
+    return {tabla: tabla for tabla in tablas}
+
+
+
+def obtener_campos5(tabla):
+    query = text(f"""
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'categorias'
+        AND table_name = '{tabla}'
+        ORDER BY ordinal_position;
+    """)
+    with engine5.connect() as conn:
+        columnas = [row[0] for row in conn.execute(query)]
+    return {col: col for col in columnas}
+
+
+
+
+def eliminar_campo5(tabla, id):
+    campos_id = {
+        'Arte_publico_monumentos': 'id_monumento',
+        'Bibliotecas_archivos': 'id_biblioteca',
+        'Barrios_colonias': 'id_barrio',
+        'Centros_culturales': 'id_centro',
+        'Edificios_historicos': 'id_edificio',
+        'Embajadas': 'id_embajada',
+        'Estaciones_de_metro': 'id_estacion',
+        'Galerias_de_arte': 'id_galeria',
+        'Gran_aforo': 'id_aforo',
+        'Hoteles': 'id_hotel',
+        'Iglecias_catedrales': 'id_iglecia',
+        'Ir_de_compras': 'id_plaza_comer',
+        'Mercados': 'id_mercado',
+        'Miradores': 'id_mirador',
+        'Museos': 'id_museo',
+        'Parques_plazas_publicas': 'id_parque',
+        'Restaurantes': 'id_rest',
+        'sitios_arqueologico': 'id_sitio',
+        'cat_hotel_estrellas': 'id_estrella',
+        'cat_restaurantes_estrellas': 'id_estrella',
+    }
+
+    columna_id = campos_id.get(tabla)
+    if not columna_id:
+        raise ValueError(f"No se encontró columna ID para la tabla '{tabla}'")
+
+    query = text(f"""DELETE FROM "categorias"."{tabla}"
+                  WHERE "{columna_id}" = :id""")
+    with engine5.connect() as conn:
+        trans = conn.begin()
+        try:
+            conn.execute(query, {'id': id})
+            trans.commit()
+        except Exception as e:
+            trans.rollback()
+            print(f"Error al eliminar el registro: {e}")
