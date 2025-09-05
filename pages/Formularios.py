@@ -83,8 +83,6 @@ def opciones(entrada):
     elif opcion == "Eliminar":
         eliminar(entrada)
 
-
-
 @st.dialog("Crear registro", width="large")
 def crear(entrada):
     Opt_M = [
@@ -103,126 +101,102 @@ def crear(entrada):
     )
 
     st.write("")
-    if entrada == "Base de datos": #alineamos en filas para que estén alineados, en lugar de alinear por columna unicamente.
-        # Fila 1
+
+    # ===== Sección Base de datos =====
+    if entrada == "Base de datos":
         fila1 = st.columns(2)
         with fila1[0]:
-            tabla = st.selectbox("Tabla", [" ", "Eventos", "Actividades", "Cursos", "Talleres"])
+            tabla = st.selectbox("Tabla", [" ", "Eventos", "Actividades", "Cursos", "Talleres"], key=f"tabla_{entrada}")
         with fila1[1]:
-            title_text = st.text_input("Título")
+            title_text = st.text_input("Título", key=f"title_{entrada}")
 
-        # Fila 2
         fila2 = st.columns(2)
         with fila2[0]:
-            category_text = st.text_input("Categoría")
+            category_text = st.text_input("Categoría", key=f"category_{entrada}")
         with fila2[1]:
-            cost_text = st.text_input("Costo")
+            cost_text = st.text_input("Costo", key=f"cost_{entrada}")
 
-        # Fila 3
         fila3 = st.columns(2)
         with fila3[0]:
-            building_name_text = st.text_input("Recinto")
+            building_name_text = st.text_input("Recinto", key=f"recinto_{entrada}")
         with fila3[1]:
-            address_text = st.text_input("Dirección")
+            address_text = st.text_input("Dirección", key=f"direccion_{entrada}")
 
-        # Fila 4
         fila4 = st.columns(2)
         with fila4[0]:
-            month_text = st.selectbox("Mes", Opt_M)
+            month_text = st.selectbox("Mes", Opt_M, key=f"mes_{entrada}")
         with fila4[1]:
-            dates_text = st.text_input("Fechas", placeholder="YYYY/MM/DD")
-            
+            dates_text = st.text_input("Fechas", placeholder="YYYY/MM/DD", key=f"fechas_{entrada}")
 
-        # Fila 5
         fila5 = st.columns(2)
         with fila5[0]:
-            hora_text = st.text_input("Hora")
+            hora_text = st.text_input("Hora", key=f"hora_{entrada}")
         with fila5[1]:
-            duracion_text = st.text_input("Duración")
+            duracion_text = st.text_input("Duración", key=f"duracion_{entrada}")
 
-        # Fila 6
         fila6 = st.columns(2)
         with fila6[0]:
-            url = st.text_input("URL")
+            url = st.text_input("URL", key=f"url_{entrada}")
         with fila6[1]:
             description_text = st.text_area(
                 "Descripción",
                 height=100,
-                placeholder="Escribe aquí la descripción del evento o actividad..."
+                placeholder="Escribe aquí la descripción del evento o actividad...",
+                key=f"description_{entrada}"
             )
 
-        # Botón
-        if st.button("Guardar registro"):
-            
+        if st.button("Guardar registro", key=f"guardar_{entrada}"):
             try:
                 cnx.Crear_registro(
                     tabla, title_text, building_name_text, address_text,
                     month_text, dates_text, hora_text, duracion_text,
                     category_text, cost_text, url, description_text
                 )
-                st.write("")
                 st.success("Registro guardado exitosamente")
             except Exception as e:
                 st.error(f"Error al guardar el registro: {e}")
 
-
-
-        
-
-# Aquí puedes agregar el código para guardar el registro en la base de datos
-
-#########################################################
-####################Markdowns############################
-#########################################################
+    # ===== Sección Markdown =====
     if entrada == "Markdown":
-    # Fila 1
         fila1 = st.columns(2)
-    with fila1[0]:
-        title = st.text_input("Título")
-    with fila1[1]:
-        category = st.text_input("Categoría")
+        with fila1[0]:
+            title = st.text_input("Título", key=f"title_{entrada}")
+        with fila1[1]:
+            category = st.text_input("Categoría", key=f"category_{entrada}")
 
-    # Fila 2
-    fila2 = st.columns(2)
-    with fila2[0]:
-        building_name = st.text_input("Recinto")
-    with fila2[1]:
-        cost = st.text_input("Costo")
+        fila2 = st.columns(2)
+        with fila2[0]:
+            building_name = st.text_input("Recinto", key=f"recinto_{entrada}")
+        with fila2[1]:
+            cost = st.text_input("Costo", key=f"cost_{entrada}")
 
-    # Fila 3
-    fila3 = st.columns(2)
-    with fila3[0]:
-        address = st.text_input("Dirección")
-    with fila3[1]:
-        url = st.text_input("URL")
+        fila3 = st.columns(2)
+        with fila3[0]:
+            address = st.text_input("Dirección", key=f"direccion_{entrada}")
+        with fila3[1]:
+            url = st.text_input("URL", key=f"url_{entrada}")
 
-    # Fila 4
-    fila4 = st.columns(2)
-    with fila4[0]:
-        month = st.selectbox("Mes", options=Opt_M, index=0)
-    with fila4[1]:
-        hour = st.text_input("Hora")
+        fila4 = st.columns(2)
+        with fila4[0]:
+            month = st.selectbox("Mes", options=Opt_M, index=0, key=f"mes_{entrada}")
+        with fila4[1]:
+            hour = st.text_input("Hora", key=f"hora_{entrada}")
 
-    # Fila 5
-    fila5 = st.columns(2)
-    with fila5[0]:
-        dates = st.text_input("Fechas", placeholder="YYYY/MM/DD")
-    with fila5[1]:
-        st.empty()  # Para balancear columnas si no hay campo
+        fila5 = st.columns(2)
+        with fila5[0]:
+            dates = st.text_input("Fechas", placeholder="YYYY/MM/DD", key=f"fechas_{entrada}")
+        with fila5[1]:
+            st.empty()  # Para balancear columnas si no hay campo
 
-    # Descripción ocupa todo el ancho
-    description = st.text_area(
-        "Descripción",
-        height=200,
-        placeholder="Escribe aquí la descripción del evento o actividad..."
-    )
+        description = st.text_area(
+            "Descripción",
+            height=200,
+            placeholder="Escribe aquí la descripción del evento o actividad...",
+            key=f"description_{entrada}"
+        )
 
-    # Botón de guardado
-    if st.button("Guardar Markdown"):
-        st.write("")
-        st.success("Registro guardado exitosamente")
-    
-
+        if st.button("Guardar Markdown", key=f"guardar_{entrada}"):
+            st.success("Registro guardado exitosamente")
 
 
 def selec_comp(Select):

@@ -1,6 +1,7 @@
 import streamlit as st
 from configparser import ConfigParser as cp
 from sqlmodel import create_engine
+from PIL import Image
 
 
 #esto crea 3 columnas, dejando el contenido centrado
@@ -12,11 +13,18 @@ def st_modal():
     _, col, _ = st.columns([1,3,1])
     return col
 
+imagen = Image.open("logos2025/LogoCDMX.png")
+imagen2 = Image.open("logos2025/LogoADIP.png")
+
 def MenuPrincipal():
     
     with st.sidebar:
-        st.markdown('<div style="text-align: center; padding-bottom: 3rem;"><img src="https://picsum.photos/120"></div>',unsafe_allow_html=True)
-        st.page_link("Pagina_Principal.py",label=" Página Principal",icon="🏠")
+    
+        st.image(imagen, width=140)
+        st.image(imagen2, width=200)
+        st.write("")
+        st.write("")
+        st.page_link("Pagina_Principal.py",label=" Página Principal",icon="🤖")
         st.page_link("pages/Formularios.py",label=" Componentes",icon="📝")
         st.page_link("pages/Chatbot.py",label=" Gráficas",icon="📊")
         st.page_link("pages/MENU_BD.py",label= "TEST")
@@ -129,7 +137,10 @@ padding-bottom:3px;
 .stAppViewContainer h1,
 .stAppViewContainer h2 {
 color: #800020 !important;
-text-align: center !important;
+display: flex;
+flex-direction: column !important;
+justify-content: center;
+align-items:center;
 font-family: 'Segoe UI', sans-serif !important;
 font-weight: 600 !important;
 }
@@ -139,15 +150,23 @@ color: #3c3c3c !important;
 
 }
 
-[data-testid="stElementContainer"]{
+[data-testid="stElementContainer"] {
 text-align: center;
 }
 
 [data-testid="stHeader"] {
-background-color: #8b233f;
+background-color: rgba(107, 27, 59);
 color: white;
 }
 
+
+img {
+border-radius: 0px !important;
+}
+
+#chat-bot-admin{
+padding:3px;
+}
 /* FIN CONTENIDO CENTRAL EN EL BLOCK */
 
 
@@ -159,15 +178,15 @@ color:white;
 }
 
 [data-testid="stSidebar"] {
-    background: linear-gradient(to bottom, #8b233f, #b34d66);
-    //background-color: rgb( 114, 19, 34);
+    
+    background-color: rgba(203, 175, 133, 0.7);
     background-size: cover;
-    color: white !important;
 }
 
 [data-testid="stSidebar"] * {
-    color: white !important;
+    color: rgba(107, 27, 59) !important;
 }
+
 
 /* FIN CONTENIDO SIDEBAR */
 

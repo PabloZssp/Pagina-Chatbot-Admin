@@ -12,9 +12,8 @@ import Herramientas as h #modulo de herramientas para links de las paginas
 #col_1,col_2=st.columns(2)
 st.set_page_config(page_title="Pagina principal", initial_sidebar_state="auto",page_icon="🤖", layout="wide")
 
+h.st_normal().image(h.imagen, use_container_width=False, )
 h.st_normal().title(" ChatBot Admin ") #se define el estilo de columnas en h
-st.write("")
-st.divider()
 st.write("")
 st.subheader("Bienvenido al Chatbot Admin, aqui podrás seleccionar los aspectos que desees administrar dentro del chatbot.")
 
