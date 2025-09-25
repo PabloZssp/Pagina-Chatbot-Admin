@@ -10,7 +10,7 @@ h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
 def menu_BD():
     h.MenuPrincipal()
-    st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬")
+    st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬", layout="wide")
     st.markdown(h.page_bg_img, unsafe_allow_html=True)
     st.title("Bases de datos")
     

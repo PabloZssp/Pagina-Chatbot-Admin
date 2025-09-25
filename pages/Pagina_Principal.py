@@ -23,13 +23,13 @@ col_1, col_2, col_3, col_4 = st.columns([1,2,2,1])  # tamaños relativos
 with col_2:
     bt_A = st.button("Ir a Componentes")
 
-with col_3:
-    bt_B = st.button("Ir a Gráficas")
+#with col_3:
+  #  bt_B = st.button("Ir a Gráficas")
 
 if bt_A:
     st.switch_page("pages/Formularios.py" )#boton para ir a la pagina de formularios
-if bt_B:
-    st.switch_page("pages/Chatbot.py" )#boton para ir a la pagina de graficas
+#if bt_B:
+ #   st.switch_page("pages/Chatbot.py" )#boton para ir a la pagina de graficas
 
 
 st.markdown(h.page_bg_img, unsafe_allow_html=True)

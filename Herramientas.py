@@ -57,9 +57,7 @@ def acceso_multiple(roles_permitidos):
         st.stop()
 
 
-##Estes es es fondo de pantalla de la pagina la imagen es de prueba se puede cambiar por cualquier otra imagen
-##Esta dividida en 2 partes una para el fondo de la pagina y otra para el fondo de la barra lateral
-##
+
 
 page_bg_img = """
 
