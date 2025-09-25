@@ -10,37 +10,38 @@ h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
 def menu_BD():
     h.MenuPrincipal()
-    st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬", layout="wide")
-    
-    h.st_normal().title("Componentes")
-    with st.container():
-        st.markdown(
-        """
-        <div style="padding-top:2rem; font-size:18px;">
-        """,
-        unsafe_allow_html=True
-    )
-
-    
-    # Aquí puedes agregar más opciones en la barra lateral si es necesario
-
-
-    Menu = ["Base de datos", "Markdown"]
-    
-    
-
-    eleccion=h.st_normal().selectbox("Selecciona el formulario",options=Menu, index=0)
-    st.write("")
-
-    #A partir de aqui vamos a poner la mayoria de las opciones que tendra la pagina
-    #como los botones para los formularios ya sea para los markdowns o para una base de datos
-    #nueva dejo 2 opciones de donde colocar los botones y ya dependiendo de como nos guste mas
-    #lo dejamos asi en la pagina para la version final
-
-
-
-    
+    st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬")
     st.markdown(h.page_bg_img, unsafe_allow_html=True)
+    st.title("Bases de datos")
+    
+    
+    rol = log.obtener_rol_actual()
+    
+    if rol == "administrador":
+        Menu =[" ","eventos_cartelera","informacion_ux","chatbot_turismo","test"]
+    elif rol== "usuarioUX":
+        Menu =[" ","informacion_ux",]
+    elif rol== "usuarioCl":
+        Menu =[" ","eventos_cartelera"]
+    elif rol== "usuarioTU":
+        Menu =[" ","chatbot_turismo"]
+   
+    Bdatos=st.selectbox("Selecciona una Base de datos:",options=Menu)
+
+    if Bdatos == "informacion_ux":
+        
+        opciones2(Bdatos)
+
+    elif Bdatos == "eventos_cartelera":
+             
+        opciones2(Bdatos)
+
+    elif Bdatos == "chatbot_turismo":        
+        
+        opciones2(Bdatos)
+
+    elif Bdatos == "test":        
+        opciones2(Bdatos)
 
 def opciones2(Bdatos):
 

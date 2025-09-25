@@ -244,7 +244,7 @@ text-align: center;
 
 
 [data-testid="stSidebar"] {
-    background: linear-gradient(to bottom, #8b233f, #b34d66);
+    background: linear-gradient(to bottom, #2e2e2e, #b34d66);
     //background-color: rgb( 114, 19, 34);
     background-size: cover;
     color: white !important;

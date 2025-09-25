@@ -11,18 +11,6 @@ h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
 def menu_BD():
 
-  #  if "tunnel" in st.session_state:
-   ##    if tunnel.is_active:
-     #    st.success("✅ El túnel SSH está activo.")
-      #  else:
-       #     st.error("❌ El túnel SSH se ha cerrado. Por favor, inicia sesión nuevamente.")
-        #    st.stop()
-    #else:
-    #    st.error("⚠️ No se encontró el túnel en la sesión. Inicia sesión primero.")
-     #   st.stop()
-        
-
-
     h.MenuPrincipal()
     st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬")
     st.markdown(h.page_bg_img, unsafe_allow_html=True)
