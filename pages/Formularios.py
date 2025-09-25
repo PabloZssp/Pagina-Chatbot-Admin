@@ -10,34 +10,37 @@ h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
 def menu_BD():
     h.MenuPrincipal()
-
-    st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬")
-
-    st.markdown(h.page_bg_img, unsafe_allow_html=True)
-    st.title("Bases de datos")
-    rol = log.obtener_rol_actual()
+    st.set_page_config(page_title="Componetes", initial_sidebar_state="auto",page_icon="💬", layout="wide")
     
-    if rol == "administrador":
-        Menu =[" ","eventos_cartelera","informacion_ux","chatbot_turismo","test"]
-    elif rol== "usuarioUX":
-        Menu =[" ","informacion_ux",]
-    elif rol== "usuarioCl":
-        Menu =[" ","eventos_cartelera"]
-    elif rol== "usuarioTU":
-        Menu =[" ","chatbot_turismo"]
-    Bdatos=st.selectbox("Selecciona una Base de datos:",options=Menu)
+    h.st_normal().title("Componentes")
+    with st.container():
+        st.markdown(
+        """
+        <div style="padding-top:2rem; font-size:18px;">
+        """,
+        unsafe_allow_html=True
+    )
 
-    if Bdatos == "informacion_ux":
-        opciones2(Bdatos)
+    
+    # Aquí puedes agregar más opciones en la barra lateral si es necesario
 
-    elif Bdatos == "eventos_cartelera":
-        opciones2(Bdatos)
 
-    elif Bdatos == "chatbot_turismo":      
-        opciones2(Bdatos)
+    Menu = ["Base de datos", "Markdown"]
+    
+    
 
-    elif Bdatos == "test":        
-        opciones2(Bdatos)
+    eleccion=h.st_normal().selectbox("Selecciona el formulario",options=Menu, index=0)
+    st.write("")
+
+    #A partir de aqui vamos a poner la mayoria de las opciones que tendra la pagina
+    #como los botones para los formularios ya sea para los markdowns o para una base de datos
+    #nueva dejo 2 opciones de donde colocar los botones y ya dependiendo de como nos guste mas
+    #lo dejamos asi en la pagina para la version final
+
+
+
+    
+    st.markdown(h.page_bg_img, unsafe_allow_html=True)
 
 def opciones2(Bdatos):
 
@@ -58,9 +61,9 @@ def crear2(baseD):
              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
     
     if baseD=="test":
-         tabla = cnx.obtener_tablas()
+         tabla = cn.obtener_tablas5()
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cnx.obtener_columnas(slect_t)
+         campos =cn.obtener_campos5(slect_t)
          
     elif baseD=="informacion_ux":
         tabla = cn.obtener_tablas()
@@ -75,7 +78,7 @@ def crear2(baseD):
     elif baseD=="chatbot_turismo":
          tabla = cn.obtener_tablas3()
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos3(slect_t)     
+         campos =cn.obtener_campos3(slect_t)     # obtiene los datos de la tabla
     else:
         st.text("seleciona una base de datos valida")
    
@@ -107,7 +110,7 @@ def crear2(baseD):
         try:
 
             if baseD=="test":
-                 cnx.Crear_registro2(slect_t,valores)
+                 cn.crear_registro5(slect_t,valores)
                  st.success("Registro guardado exitosamente")
             elif baseD=="informacion_ux":
                  cn.crear_registro(slect_t, valores)
@@ -129,8 +132,8 @@ def crear2(baseD):
 def selec_comp2(tabla,basedatos):
    
     if basedatos=="test":
-        columnas = cnx.obtener_columnas(tabla)
-        registros= cnx.obtener_Actividades()
+        columnas = cn.obtener_campos5(tabla)
+        registros= cn.obtener_eventos5(tabla)
     elif basedatos=="informacion_ux":
         columnas = cn.obtener_campos(tabla)         # obtiene los nombres de las columnas
         registros = cn.obtener_eventos(tabla)        # obtiene los datos de la tabla
@@ -153,7 +156,7 @@ def leer2(basedatos):
        st.subheader(f"Leer registros de: {basedatos} ")
 
        if basedatos=="test":
-            diccionario_tablas = cnx.obtener_tablas()
+            diccionario_tablas = cn.obtener_tablas5()
        elif basedatos=="informacion_ux":
            diccionario_tablas= cn.obtener_tablas()
        elif basedatos=="eventos_cartelera":
@@ -177,11 +180,11 @@ def modificar2(t_elec,bdatos):
     Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
     
     if bdatos=="test":
-     campos =cnx.obtener_columnas(t_elec)
+     campos =cn.obtener_campos5(t_elec)
      st.write("Selecciona el campo a modificar")
-     ids = cnx.editar_campo(t_elec)
+     ids = cn.editar_campo5(t_elec)
      id_seleccionado = st.selectbox("Selecciona un ID", ids)
-     registro= cnx.obtener_registro_id(id_seleccionado,t_elec)
+     registro= cn.obtener_registro_id5(id_seleccionado,t_elec,campos)
 
     elif bdatos=="informacion_ux":
       campos =cn.obtener_campos(t_elec)
@@ -240,7 +243,7 @@ def modificar2(t_elec,bdatos):
     if G_b:
 
         if bdatos=="test":
-         cn.actualizar_registro(t_elec,id_seleccionado,valores)
+         cn.actualizar_registro5(t_elec,id_seleccionado,valores)
          st.success("Registro actualizado correctamente")
 
 
@@ -264,7 +267,7 @@ def modificar2(t_elec,bdatos):
 @st.dialog("Eliminar",width="large")    
 def eliminar2(Bdatos):
     if Bdatos=="test":
-       D_tab= cnx.obtener_tablas()
+       D_tab= cn.obtener_tablas5()
 
     elif Bdatos=="informacion_ux":
        D_tab= cn.obtener_tablas()
@@ -286,8 +289,8 @@ def eliminar2(Bdatos):
     c1,c2 = st.columns([5,5])
 
     if Bdatos=="test":
-      ids = cnx.editar_campo(t_selec)
-      campos= cnx.obtener_columnas(t_selec)
+      ids = cn.editar_campo5(t_selec)
+      campos= cn.obtener_campos5(t_selec)
 
     elif Bdatos=="informacion_ux":
       ids = cn.editar_campo(t_selec)
@@ -309,7 +312,7 @@ def eliminar2(Bdatos):
          id_seleccionado = st.selectbox("Selecciona un ID", ids) 
          
          if Bdatos=="test":
-          registro=cnx.obtener_registro_id(id_seleccionado, t_selec)
+          registro=cn.obtener_registro_id5(id_seleccionado, t_selec,campos)
          elif Bdatos=="informacion_ux":
           registro=cn.obtener_registro_id(id_seleccionado, t_selec,campos)
          elif Bdatos=="eventos_cartelera":
@@ -345,7 +348,7 @@ def eliminar2(Bdatos):
     if b_El:
 
          if Bdatos=="test":
-          cnx.eliminar_registro(t_selec,id_seleccionado)
+          cn.eliminar_campo5(t_selec,id_seleccionado)
           st.success("Registro eliminado exitosamente.") 
 
 
@@ -366,5 +369,6 @@ def eliminar2(Bdatos):
          else:
              st.text("seleciona una base de datos valida")
 
-
 menu_BD()
+
+

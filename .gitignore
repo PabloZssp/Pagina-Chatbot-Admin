@@ -6,4 +6,3 @@ Dockerfile
 requirements.txt
 .dockerignore
 docker-compose.yml
-.git

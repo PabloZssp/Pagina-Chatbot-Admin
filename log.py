@@ -22,8 +22,8 @@ def log_in():
                 password_bytes = clave_pass.encode() if clave_pass else None
 
                 if validar_llaves(private_key_bytes, public_key_pem, password_bytes):
-                    tunnel = cn.crear_tunel(private_key_bytes, clave_pass if clave_pass else None)
-                    st.session_state["tunnel"] = tunnel
+                    #tunnel = cn.crear_tunel(private_key_bytes, clave_pass if clave_pass else None)
+                    #st.session_state["tunnel"] = tunnel
                     st.session_state["usuario"] = user[0]
                     st.session_state["rol"] = user[1]
                     st.success("¡Inicio de sesión exitoso!")
