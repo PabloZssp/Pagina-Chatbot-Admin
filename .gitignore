@@ -6,3 +6,4 @@ Dockerfile
 requirements.txt
 .dockerignore
 docker-compose.yml
+nginx.conf
