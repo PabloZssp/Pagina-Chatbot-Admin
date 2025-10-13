@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import Herramientas as h  
-import Conexion as cnx 
 import conexion2 as cn
 import log
 
@@ -61,9 +60,6 @@ def opciones(tabla,campos,Bdatos):
         leer(Bdatos)     
     elif opcion == "Eliminar":
         eliminar(tabla)
-
-
-
 
 @st.dialog("Crear", width="large")
 def crear(tabla, campos,baseD):

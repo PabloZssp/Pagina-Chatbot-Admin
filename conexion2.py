@@ -3,11 +3,13 @@ from dotenv import load_dotenv
 import os
 from sshtunnel import SSHTunnelForwarder
 import paramiko
+import streamlit as st
 
 from io import StringIO
 
 # Cargar variables del archivo .env
 load_dotenv()
+
 
 # Obtener las variables
 DBS_USER = os.getenv("DBS_USER")
@@ -19,11 +21,20 @@ DBS_NAMEC = os.getenv("DBS_NAMEC")
 DBS_NAMET = os.getenv("DBS_NAMET")
 DBS_NAMEF = os.getenv("DBS_NAMEF")
 
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAMEU = os.getenv("DB_NAMEU")
+DB_NAMEC = os.getenv("DB_NAMEC")
+DB_NAMET = os.getenv("DB_NAMET")
+DB_NAMEF = os.getenv("DB_NAMEF")
 
-DATABASE_URL = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEU}"
-DATABASE_URL2 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEC}"
-DATABASE_URL3 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMET}"
-DATABASE_URL6 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEF}"
+
+DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEU}"
+DATABASE_URL2 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEC}"
+DATABASE_URL3 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMET}"
+DATABASE_URL6 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEF}"
 
 
 
@@ -47,7 +58,7 @@ engine4 = create_engine(DATABASE_URL4)
 ############################ UX ################ 
 def obtener_eventos(tabla):
     query = f"SELECT * FROM {tabla} ORDER BY id ASC"
-    with engine.connect() as conn:
+    with engine5.connect() as conn:
         result = conn.execute(text(query))
         rows = result.fetchall()
     return rows
@@ -55,7 +66,7 @@ def obtener_eventos(tabla):
 
 def editar_campo(t_seleccion):
     query = text(f"SELECT id FROM {t_seleccion} ORDER BY id")
-    with engine.connect() as conn:
+    with engine5.connect() as conn:
         result = conn.execute(query)
         ids = [row[0] for row in result.fetchall()]
     return ids
@@ -72,7 +83,7 @@ def crear_registro(tabla, valores):
     query = text(f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})")
 
     try:
-        with engine.begin() as conn:
+        with engine5.begin() as conn:
             conn.execute(query, valores)  # valores es un dict
     except Exception as e:
         print(f"Error al insertar registro: {e}")
@@ -88,7 +99,7 @@ def obtener_registro_id(id_evento, t_Select, campos):
         FROM {t_Select} WHERE id = :id_evento
     """)
 
-    with engine.connect() as conn:
+    with engine5.connect() as conn:
         result = conn.execute(query, {"id_evento": id_evento})
         evento = result.fetchone()
 
@@ -111,7 +122,7 @@ def obtener_tablas():
         WHERE table_schema = 'public'
         ORDER BY table_name;
     """)
-    with engine.connect() as conn:
+    with engine5.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
 
@@ -124,7 +135,7 @@ def obtener_campos(tabla):
         AND table_name = :tabla
         ORDER BY ordinal_position;
     """)
-    with engine.connect() as conn:
+    with engine5.connect() as conn:
         columnas = [row[0] for row in conn.execute(query, {"tabla": tabla})]
     return {col: col for col in columnas}
 
@@ -208,6 +219,7 @@ def obtener_tablas2():
     with engine2.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
+
 
 def obtener_campos2(tabla):
     """Devuelve un diccionario {columna: columna} de la tabla indicada."""
@@ -770,7 +782,7 @@ DBS_PASSWORD = os.getenv("DBS_PASSWORD")
 DBS_NAME = os.getenv("DBS_NAMET")
 DBS_PORT = int(os.getenv("DBS_PORT"))
 DBS_HOST = os.getenv("DBS_HOST")
-DATABASE_S_URL = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAME}"
+DATABASE_S_URL = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEU}"
 engine5 = create_engine(DATABASE_S_URL)
 
 
@@ -778,22 +790,85 @@ engine5 = create_engine(DATABASE_S_URL)
 ################tunelssh############
 ####################################
 
+import paramiko
+import socket
+import threading
+import select
+import os
+from io import StringIO
+
 def crear_tunel(clave_privada_bytes, clave_pass=None):
-    # Cargar la clave ED25519 directamente
+    SSH_HOST_2 = os.getenv("SSH_SERVER", "192.168.22.9")
+    SSH_USER_2 = os.getenv("SSH_USER", "um-cdmx-adip-dii-04")
+    LOCAL_PORT = 6543
+    REMOTE_HOST = "127.0.0.1"  # base de datos local en dii-04
+    REMOTE_PORT = int(os.getenv("DBS_PORT", 5432))
+
+    print(f"Conectando a {SSH_USER_2}@{SSH_HOST_2} para crear túnel SSH...")
+
+    # --- Preparar la llave privada desde los bytes cargados ---
     clave_stream = StringIO(clave_privada_bytes.decode())
-    clave_objeto = paramiko.Ed25519Key.from_private_key(clave_stream, password=clave_pass)
+    try:
+        key = paramiko.Ed25519Key.from_private_key(clave_stream, password=clave_pass)
+    except paramiko.ssh_exception.SSHException:
+        # Si no es Ed25519, intentar con RSA
+        clave_stream.seek(0)
+        key = paramiko.RSAKey.from_private_key(clave_stream, password=clave_pass)
 
-    # Crear el túnel usando el objeto de clave
-    server = SSHTunnelForwarder(
-        ssh_address_or_host=(SSH_HOST, SSH_PORT),
-        ssh_username=SSH_USER,
-        ssh_pkey=clave_objeto,
-        remote_bind_address=(DBS_HOST, DBS_PORT),
-        local_bind_address=('localhost', 6543)
+    # --- Crear cliente SSH y conectar ---
+    ssh2 = paramiko.SSHClient()
+    ssh2.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh2.connect(
+        SSH_HOST_2,
+        username=SSH_USER_2,
+        pkey=key
     )
-    server.start()
-    return server
 
+    transport2 = ssh2.get_transport()
+
+    # --- Función manejadora de sockets ---
+    def handler(client_socket):
+        try:
+            chan = transport2.open_channel(
+                'direct-tcpip',
+                (REMOTE_HOST, REMOTE_PORT),
+                client_socket.getpeername()
+            )
+        except Exception as e:
+            print(f"Error al abrir canal SSH: {e}")
+            client_socket.close()
+            return
+
+        while True:
+            r, _, _ = select.select([client_socket, chan], [], [])
+            if client_socket in r:
+                data = client_socket.recv(1024)
+                if len(data) == 0:
+                    break
+                chan.send(data)
+            if chan in r:
+                data = chan.recv(1024)
+                if len(data) == 0:
+                    break
+                client_socket.send(data)
+
+        chan.close()
+        client_socket.close()
+
+    # --- Servidor local para redirigir el puerto ---
+    def forward_tunnel():
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind(('127.0.0.1', LOCAL_PORT))
+        sock.listen(100)
+        print(f"Túnel activo en localhost:{LOCAL_PORT} -> {REMOTE_HOST}:{REMOTE_PORT}")
+
+        while True:
+            client_sock, _ = sock.accept()
+            threading.Thread(target=handler, args=(client_sock,), daemon=True).start()
+
+    threading.Thread(target=forward_tunnel, daemon=True).start()
+    return ssh2
 
 
 ###############################
