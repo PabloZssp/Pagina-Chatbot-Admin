@@ -48,8 +48,8 @@ def log_in():
 
                     
                     if validar_llaves(private_key_bytes, public_key_pem, password_bytes):
-                        tunnel = cn.crear_tunel(private_key_bytes, clave_pass if clave_pass else None)
-                        st.session_state["tunnel"] = tunnel
+                       # tunnel = cn.crear_tunel(private_key_bytes, clave_pass if clave_pass else None)
+                        #st.session_state["tunnel"] = tunnel
                         st.session_state["usuario"] = usuario
                         st.session_state["rol"] = user_data["rol"]
                         st.success("¡Inicio de sesión exitoso!")
@@ -65,7 +65,7 @@ def log_in():
 
 def log_out():
     if "tunnel" in st.session_state:
-        st.session_state["tunnel"].stop()
+        st.session_state["tunnel"].close()
         del st.session_state["tunnel"]
 
     for key in ["usuario", "rol"]:

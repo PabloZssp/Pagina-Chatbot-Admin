@@ -37,8 +37,7 @@ def menu_BD():
         opciones2(Bdatos)
 
     elif Bdatos == "chatbot_turismo":        
-        
-       squma =st.selectbox("Elige un esquema", options=[" ","categorias","preguntas_frecuentes","prompts_seguridad"])
+       squma =st.selectbox("Elige un esquema", options=[" ","categorias","preguntas_frecuentes"])
        if squma != " ":
          opcionesT(Bdatos,squma)
 
@@ -119,14 +118,16 @@ def crear2(baseD):
         with col1 if indice % 2 == 0 else col2:
             if "fecha" in campo.lower():
                 valores[campo] = st.date_input(f"**{campo}:**")
-            elif "dates" in campo.lower():
-                valores[campo] =st.date_input(f"{campo}:")
+            elif "dates_otros" in campo.lower():
+                valores[campo] = st.text_input(f"{campo}:")
             elif "month"  in campo.lower():
                 valores[campo] = st.selectbox(f"{campo}:", options=Opt_M)
-            elif "descripcion"  in campo.lower():
+            elif "description"  in campo.lower():
                 valores[campo] =st.text_area(f"{campo}:",height=100,placeholder="Escribe aqui tu descrpcion:")
+            elif "dates"  in campo.lower():
+                valores[campo] =st.date_input(f"**{campo}:**")
             else:
-                valores[campo] = st.text_input(f"{campo}:")
+               valores[campo] = st.text_input(f"{campo}:")
         indice +=1
 
     if st.button("Guardar registro", key="guardar_registro"):
@@ -139,7 +140,7 @@ def crear2(baseD):
                  cn.crear_registro(slect_t, valores)
                  st.success("Registro guardado exitosamente")     
             elif baseD=="eventos_cartelera":
-                 cn.crear_registro(slect_t, valores)
+                 cn.crear_registro2(slect_t, valores)
                  st.success("Registro guardado exitosamente")
             elif baseD=="chatbot_turismo":
                  if esquema=="categorias":
@@ -200,7 +201,7 @@ def crear2(baseD):
                     elif baseD == "informacion_ux":
                         cn.crear_registro(slect_t, valores_fila)
                     elif baseD == "eventos_cartelera":
-                        cn.crear_registro(slect_t, valores_fila)
+                        cn.crear_registro2(slect_t, valores_fila)
                     elif baseD == "chatbot_turismo":
                         cn.crear_registro3(slect_t, valores_fila)
                     elif baseD == "chatbot_fifa":
@@ -315,8 +316,12 @@ def modificar2(t_elec,bdatos):
         with col1 if valor_idx % 2 == 0 else col2:
             valor_actual = registro[valor_idx]
 
-            if "fecha" in campo.lower() or "dates" in campo.lower():
+            if "fecha" in campo.lower() :
                 valores[campo] = st.date_input(f"{campo}:", value=None)
+            elif "dates_otros" in campo.lower():
+                valores[campo] = st.text_input(f"{campo}:", value=valor_actual)
+            elif "dates" in campo.lower():
+                valores[campo] = st.date_input(f"{campo}:", value=valor_actual)
             elif "month" in campo.lower():
                 valores[campo] = st.selectbox(f"{campo}:", options=Opt_M, index=Opt_M.index(valor_actual) if valor_actual in Opt_M else 0)
             elif "descripcion" in campo.lower():
@@ -325,6 +330,8 @@ def modificar2(t_elec,bdatos):
                 valores[campo]= st.text_area( f"{campo}:", value=valor_actual, height=100)
             elif "pregunta" in campo.lower():
                 valores[campo]= st.text_area( f"{campo}:", value=valor_actual, height=100)
+            elif "codigo_postal" in campo.lower():
+                valores[campo] = st.number_input(f"{campo}:", value=int(valor_actual) if pd.notna(valor_actual) else 0, step=1)
             else:
                 valores[campo] = st.text_input(f"{campo}:", value=valor_actual)
 
@@ -810,17 +817,17 @@ def eliminarT(esquema):
     b_El = st.button("Eliminar registro")
     if b_El:
 
-         if esquema=="test":
+         if esquema=="categorias":
           cn.eliminar_campo3(t_selec,id_seleccionado)
           st.success("Registro eliminado exitosamente.") 
 
 
-         elif esquema=="informacion_ux":
+         elif esquema=="preguntas_frecuentes":
           cn.eliminar_campo3_1(t_selec,id_seleccionado,esquema)
           st.success("Registro eliminado exitosamente.") 
           
         
-         elif esquema=="eventos_cartelera":
+         elif esquema=="prompts_seguridad":
           cn.eliminar_campo3_1(t_selec,id_seleccionado,esquema)
           st.success("Registro eliminado exitosamente.") 
         

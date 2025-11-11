@@ -1,10 +1,7 @@
 from sqlalchemy import create_engine,text
 from dotenv import load_dotenv
 import os
-from sshtunnel import SSHTunnelForwarder
 import paramiko
-import streamlit as st
-
 from io import StringIO
 
 # Cargar variables del archivo .env
@@ -32,9 +29,9 @@ DB_NAMEF = os.getenv("DB_NAMEF")
 
 
 DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEU}"
-DATABASE_URL2 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEC}"
-DATABASE_URL3 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMET}"
-DATABASE_URL6 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEF}"
+DATABASE_URL2 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEC}"
+DATABASE_URL3 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMET}"
+DATABASE_URL6 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEF}"
 
 
 
@@ -58,7 +55,7 @@ engine4 = create_engine(DATABASE_URL4)
 ############################ UX ################ 
 def obtener_eventos(tabla):
     query = f"SELECT * FROM {tabla} ORDER BY id ASC"
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         result = conn.execute(text(query))
         rows = result.fetchall()
     return rows
@@ -66,7 +63,7 @@ def obtener_eventos(tabla):
 
 def editar_campo(t_seleccion):
     query = text(f"SELECT id FROM {t_seleccion} ORDER BY id")
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         result = conn.execute(query)
         ids = [row[0] for row in result.fetchall()]
     return ids
@@ -83,7 +80,7 @@ def crear_registro(tabla, valores):
     query = text(f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})")
 
     try:
-        with engine5.begin() as conn:
+        with engine.begin() as conn:
             conn.execute(query, valores)  # valores es un dict
     except Exception as e:
         print(f"Error al insertar registro: {e}")
@@ -99,7 +96,7 @@ def obtener_registro_id(id_evento, t_Select, campos):
         FROM {t_Select} WHERE id = :id_evento
     """)
 
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         result = conn.execute(query, {"id_evento": id_evento})
         evento = result.fetchone()
 
@@ -122,7 +119,7 @@ def obtener_tablas():
         WHERE table_schema = 'public'
         ORDER BY table_name;
     """)
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
 
@@ -135,7 +132,7 @@ def obtener_campos(tabla):
         AND table_name = :tabla
         ORDER BY ordinal_position;
     """)
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         columnas = [row[0] for row in conn.execute(query, {"tabla": tabla})]
     return {col: col for col in columnas}
 
@@ -256,6 +253,8 @@ def obtener_eventos3(tabla):
         'Bibliotecas_archivos':'id_biblioteca',
         'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
+        'Cartelera_dia_de_muertos_2025': 'id_evento',
+        'Eventos_turisticos_2025': 'id_evento',
         'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
@@ -294,6 +293,8 @@ def editar_campo3(t_seleccion):
         'Bibliotecas_archivos':'id_biblioteca',
         'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
+        'Cartelera_dia_de_muertos_2025': 'id_evento',
+        'Eventos_turisticos_2025': 'id_evento',
         'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
@@ -356,6 +357,8 @@ def obtener_registro_id3(id_evento, t_Select, campos):
         'Bibliotecas_archivos': 'id_biblioteca',
         'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
+        'Cartelera_dia_de_muertos_2025': 'id_evento',
+        'Eventos_turisticos_2025': 'id_evento',
         'Edificios_historicos': 'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
@@ -401,6 +404,8 @@ def actualizar_registro3(tabla, id_registro, nuevos_valores):
         'Bibliotecas_archivos': 'id_biblioteca',
         'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
+        'Cartelera_dia_de_muertos_2025': 'id_evento',
+        'Eventos_turisticos_2025': 'id_evento',
         'Edificios_historicos': 'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
@@ -446,6 +451,7 @@ def obtener_tablas3():
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'categorias'
+        AND table_name NOT LIKE '%copy%'
         ORDER BY table_name;
     """)
     with engine3.connect() as conn:
@@ -475,6 +481,8 @@ def eliminar_campo3(tabla, id):
         'Bibliotecas_archivos': 'id_biblioteca',
         'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
+        'Cartelera_dia_de_muertos_2025': 'id_evento',
+        'Eventos_turisticos_2025': 'id_evento',
         'Edificios_historicos': 'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
@@ -555,7 +563,7 @@ def obtener_registro_id3_1(id_evento, t_Select, campos,esquema):
 
     return evento
 
-def actualizar_registro2(tabla, id_registro, nuevos_valores):
+def actualizar_registro3_1(tabla, id_registro, nuevos_valores):
     set_clause = ", ".join([f"{campo} = :{campo}" for campo in nuevos_valores])
     query = text(f"UPDATE {tabla} SET {set_clause} WHERE id = :id")
 

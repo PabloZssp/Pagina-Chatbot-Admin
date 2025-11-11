@@ -39,7 +39,7 @@ def menu_BD():
 
     elif Bdatos == "chatbot_turismo":        
         
-       squma =st.selectbox("Elige un esquema", options=[" ","categorias","preguntas_frecuentes","prompts_seguridad"])
+       squma =st.selectbox("Elige un esquema", options=[" ","categorias","preguntas_frecuentes"])
        if squma != " ":
          opcionesT(Bdatos,squma)
 
@@ -304,7 +304,14 @@ def crear2(baseD):
         nombre = archivo.name
 
         if nombre.endswith(".csv"):
-            df = pd.read_csv(archivo)
+            try:
+                df = pd.read_csv(archivo, encoding='utf-8')
+            except UnicodeDecodeError:
+                try:
+                    df = pd.read_csv(archivo, encoding='latin1')
+                except Exception as e:
+                    st.error(f"No se pudo leer el archivo CSV: {e}")
+                    df = None
         elif nombre.endswith(".xlsx"):
             df = pd.read_excel(archivo)
         else:
@@ -342,7 +349,13 @@ def crear2(baseD):
                     elif baseD == "eventos_cartelera":
                         cn.crear_registro(slect_t, valores_fila)
                     elif baseD == "chatbot_turismo":
-                        cn.crear_registro3(slect_t, valores_fila)
+                        if esquema=="categorias":
+                            cn.crear_registro3(slect_t, valores_fila)
+                        elif esquema=="preguntas_frecuentes":
+                            cn.crear_registro3_1(slect_t, valores_fila,esquema)
+                        elif esquema=="prompts_seguridad":
+                            cn.crear_registro3_2(slect_t, valores_fila,esquema)   
+                        st.success("Registro guardado exitosamente")
                     elif baseD == "chatbot_fifa":
                         cn.crear_registro6(slect_t, valores_fila)
 
@@ -682,7 +695,7 @@ def crearT(esquema):
             elif esquema=="preguntas_frecuentes":
              cn.crear_registro3_1(slect_t, valores,esquema)
             elif esquema=="prompts_seguridad":
-             cn.crear_registro3_1(slect_t, valores,esquema)
+             cn.crear_registro3_2(slect_t, valores,esquema)
              st.success("Registro guardado exitosamente")
             
             else:
@@ -730,10 +743,10 @@ def crearT(esquema):
                     valores_fila = fila[columnas_tabla].to_dict()
                     if esquema == "categorias":
                         cn.crear_registro3(slect_t, valores_fila)
-                    elif esquema == "informacion_ux":
+                    elif esquema == "preguntas_frecuentes":
                         cn.crear_registro3_1(slect_t, valores_fila,esquema)
-                    elif esquema == "eventos_cartelera":
-                        cn.crear_registro3_1(slect_t, valores_fila,esquema)
+                    elif esquema == "prompts_seguridad":
+                        cn.crear_registro3_2(slect_t, valores_fila,esquema)
 
                 st.success("Todos los registros fueron cargados correctamente.")
 
@@ -950,17 +963,17 @@ def eliminarT(esquema):
     b_El = st.button("Eliminar registro")
     if b_El:
 
-         if esquema=="test":
+         if esquema=="categorias":
           cn.eliminar_campo3(t_selec,id_seleccionado)
           st.success("Registro eliminado exitosamente.") 
 
 
-         elif esquema=="informacion_ux":
+         elif esquema=="preguntas_frecuentes":
           cn.eliminar_campo3_1(t_selec,id_seleccionado,esquema)
           st.success("Registro eliminado exitosamente.") 
           
         
-         elif esquema=="eventos_cartelera":
+         elif esquema=="prompts_seguridad":
           cn.eliminar_campo3_1(t_selec,id_seleccionado,esquema)
           st.success("Registro eliminado exitosamente.") 
         
