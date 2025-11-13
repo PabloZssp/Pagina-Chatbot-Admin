@@ -1,7 +1,7 @@
 import streamlit as st
 import json
 from cryptography.hazmat.primitives import serialization
-import conexion2 as cn  # si sigues usando cn para crear túnel
+import conexion2 as cn 
 
 
 def cargar_usuarios_json(ruta="usuarios.json"):
@@ -48,8 +48,8 @@ def log_in():
 
                     
                     if validar_llaves(private_key_bytes, public_key_pem, password_bytes):
-                        tunnel = cn.crear_tunel(private_key_bytes, clave_pass if clave_pass else None)
-                        st.session_state["tunnel"] = tunnel
+                       # tunnel = cn.crear_tunel(private_key_bytes, clave_pass if clave_pass else None)
+                        #st.session_state["tunnel"] = tunnel
                         st.session_state["usuario"] = usuario
                         st.session_state["rol"] = user_data["rol"]
                         st.success("¡Inicio de sesión exitoso!")
@@ -65,14 +65,23 @@ def log_in():
 
 def log_out():
     if "tunnel" in st.session_state:
-        st.session_state["tunnel"].stop()
-        del st.session_state["tunnel"]
+        tunnel = st.session_state["tunnel"]
+        try:
+            if hasattr(tunnel, "stop"):
+                tunnel.stop()
+            elif hasattr(tunnel, "close"):
+                tunnel.close()
+        except Exception as e:
+            print(f"Error al cerrar el túnel: {e}")
+        finally:
+            del st.session_state["tunnel"]
 
     for key in ["usuario", "rol"]:
         if key in st.session_state:
             del st.session_state[key]
 
     st.switch_page("inicio.py")
+
 
 
 def obtener_rol_actual():

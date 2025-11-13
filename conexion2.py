@@ -25,17 +25,16 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
-DB_NAMEU = os.getenv("DB_NAMEU")
+DB_NAMEU = os.getenv("DB_NAMEUX")
 DB_NAMEC = os.getenv("DB_NAMEC")
 DB_NAMET = os.getenv("DB_NAMET")
 DB_NAMEF = os.getenv("DB_NAMEF")
 
 
 DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEU}"
-DATABASE_URL2 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEC}"
-DATABASE_URL3 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMET}"
-DATABASE_URL6 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEF}"
-
+DATABASE_URL2 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEC}"
+DATABASE_URL3 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMET}"
+DATABASE_URL6 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEF}"
 
 
 engine = create_engine(DATABASE_URL)
@@ -58,7 +57,7 @@ engine4 = create_engine(DATABASE_URL4)
 ############################ UX ################ 
 def obtener_eventos(tabla):
     query = f"SELECT * FROM {tabla} ORDER BY id ASC"
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         result = conn.execute(text(query))
         rows = result.fetchall()
     return rows
@@ -66,7 +65,7 @@ def obtener_eventos(tabla):
 
 def editar_campo(t_seleccion):
     query = text(f"SELECT id FROM {t_seleccion} ORDER BY id")
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         result = conn.execute(query)
         ids = [row[0] for row in result.fetchall()]
     return ids
@@ -83,7 +82,7 @@ def crear_registro(tabla, valores):
     query = text(f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})")
 
     try:
-        with engine5.begin() as conn:
+        with engine.begin() as conn:
             conn.execute(query, valores)  # valores es un dict
     except Exception as e:
         print(f"Error al insertar registro: {e}")
@@ -99,7 +98,7 @@ def obtener_registro_id(id_evento, t_Select, campos):
         FROM {t_Select} WHERE id = :id_evento
     """)
 
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         result = conn.execute(query, {"id_evento": id_evento})
         evento = result.fetchone()
 
@@ -122,7 +121,7 @@ def obtener_tablas():
         WHERE table_schema = 'public'
         ORDER BY table_name;
     """)
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
 
@@ -135,7 +134,7 @@ def obtener_campos(tabla):
         AND table_name = :tabla
         ORDER BY ordinal_position;
     """)
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         columnas = [row[0] for row in conn.execute(query, {"tabla": tabla})]
     return {col: col for col in columnas}
 
@@ -248,6 +247,7 @@ def eliminar_campo2(tabla, id):
             print(f"Error al eliminar el registro: {e}")
 
 ##################turismo###############################################
+
 
 #######categorias###########
 def obtener_eventos3(tabla):
@@ -507,7 +507,6 @@ def eliminar_campo3(tabla, id):
         except Exception as e:
             trans.rollback()
             print(f"Error al eliminar el registro: {e}")
-
 #####################otros esquemas ########################
 def obtener_eventos3_1(tabla,esquema):
     query = f"SELECT * FROM {esquema}.{tabla} ORDER BY id ASC"
@@ -555,15 +554,19 @@ def obtener_registro_id3_1(id_evento, t_Select, campos,esquema):
 
     return evento
 
-def actualizar_registro2(tabla, id_registro, nuevos_valores):
-    set_clause = ", ".join([f"{campo} = :{campo}" for campo in nuevos_valores])
-    query = text(f"UPDATE {tabla} SET {set_clause} WHERE id = :id")
 
-    nuevos_valores["id"] = id_registro
+def actualizar_registro3_1(tabla, id_registro, nuevos_valores, esquema):
+    try:
+        set_clause = ", ".join([f"{campo} = :{campo}" for campo in nuevos_valores])
+        query = text(f"UPDATE {esquema}.{tabla} SET {set_clause} WHERE id = :id")
 
-    with engine3.connect() as conn:
-        conn.execute(query, nuevos_valores)
-        conn.commit()
+        nuevos_valores["id"] = id_registro
+
+        with engine3.connect() as conn:
+            conn.execute(query, nuevos_valores)
+            conn.commit()
+    except Exception as e:
+        print("Error al actualizar:", e)
 
 def obtener_tablas3_1(esquema):
     query = text("""
