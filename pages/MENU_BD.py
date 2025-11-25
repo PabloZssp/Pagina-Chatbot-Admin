@@ -38,10 +38,15 @@ def menu_BD():
         opciones2(Bdatos)
 
     elif Bdatos == "chatbot_turismo":        
-        
-       squma =st.selectbox("Elige un esquema", options=[" ","categorias","preguntas_frecuentes"])
-       if squma != " ":
-         opcionesT(Bdatos,squma)
+        if rol == "administrador":
+            opciones = [" ", "categorias", "preguntas_frecuentes", "prompts_seguridad"]
+        else:
+            opciones = [" ", "categorias", "preguntas_frecuentes"]
+
+        squma = st.selectbox("Elige un esquema", options=opciones)
+
+        if squma != " ":
+            opcionesT(Bdatos, squma)
 
     elif Bdatos == "test":        
         opciones2(Bdatos)

@@ -570,7 +570,7 @@ def crearT(esquema):
         else:
             st.error("Formato no soportado.")
             df = None
-
+        
         if df is not None:
             columnas_archivo = list(df.columns)
             columnas_tabla = [c for c in campos if not c.lower().startswith("id")]
@@ -593,6 +593,9 @@ def crearT(esquema):
 
             
             if st.button("Cargar datos en la base"):
+                #normalizar datos y cargar
+                #llamar a la funcion de normalizacion
+                #cargar datos en la base de datos
                 for _, fila in df.iterrows():
                     valores_fila = fila[columnas_tabla].to_dict()
                     if esquema == "categorias":
