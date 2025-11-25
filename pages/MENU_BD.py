@@ -238,7 +238,7 @@ def crear2(baseD):
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
          campos =cn.obtener_campos3_1(slect_t)     # obtiene los datos de la tabla
       elif esquema=="prompts_seguridad":
-         tabla = cn.obtener_tablas3_2()
+         tabla = cn.obtener_tablas3_1()
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
          campos =cn.obtener_campos3_2(slect_t)     # obtiene los datos de la tabla
 
@@ -284,7 +284,7 @@ def crear2(baseD):
                  cn.crear_registro(slect_t, valores)
                  st.success("Registro guardado exitosamente")     
             elif baseD=="eventos_cartelera":
-                 cn.crear_registro(slect_t, valores)
+                 cn.crear_registro2(slect_t, valores)
                  st.success("Registro guardado exitosamente")
             elif baseD=="chatbot_turismo":
                  if esquema=="categorias":
@@ -292,7 +292,7 @@ def crear2(baseD):
                  elif esquema=="preguntas_frecuentes":
                     cn.crear_registro3_1(slect_t, valores)
                  elif esquema=="prompts_seguridad":
-                    cn.crear_registro3_2(slect_t, valores)   
+                    cn.crear_registro3_1(slect_t, valores)   
                  st.success("Registro guardado exitosamente")
             elif baseD=="chatbot_fifa":
                  cn.crear_registro6(slect_t,valores)
@@ -352,7 +352,7 @@ def crear2(baseD):
                     elif baseD == "informacion_ux":
                         cn.crear_registro(slect_t, valores_fila)
                     elif baseD == "eventos_cartelera":
-                        cn.crear_registro(slect_t, valores_fila)
+                        cn.crear_registro2(slect_t, valores_fila)
                     elif baseD == "chatbot_turismo":
                         if esquema=="categorias":
                             cn.crear_registro3(slect_t, valores_fila)
@@ -967,16 +967,14 @@ def eliminarT(esquema):
         
     b_El = st.button("Eliminar registro")
     if b_El:
-
+        
          if esquema=="categorias":
           cn.eliminar_campo3(t_selec,id_seleccionado)
           st.success("Registro eliminado exitosamente.") 
-
-
+         
          elif esquema=="preguntas_frecuentes":
           cn.eliminar_campo3_1(t_selec,id_seleccionado,esquema)
-          st.success("Registro eliminado exitosamente.") 
-          
+          st.success("Registro eliminado exitosamente.")        
         
          elif esquema=="prompts_seguridad":
           cn.eliminar_campo3_1(t_selec,id_seleccionado,esquema)

@@ -4,6 +4,7 @@ import pandas as pd
 import Herramientas as h  # Módulo de herramientas para links de las páginas
 import conexion2 as cn # Módulo para la conexion de la base de datos principal 
 import log 
+from normalizacion import normalizar_dataframe
 h.verificar_sesion()
 h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
@@ -37,8 +38,12 @@ def menu_BD():
         opciones2(Bdatos)
 
     elif Bdatos == "chatbot_turismo":        
-       squma =st.selectbox("Elige un esquema", options=[" ","categorias","preguntas_frecuentes"])
-       if squma != " ":
+        if rol=="administrador":
+            opcionesMT =[" ","categorias","preguntas_frecuentes","prompts_seguridad"]
+        else:
+            opcionesMT =[" ","categorias","preguntas_frecuentes"]
+        squma =st.selectbox("Elige un esquema", options=opcionesMT)
+        if squma != " ":
          opcionesT(Bdatos,squma)
 
     elif Bdatos == "test":        
@@ -92,9 +97,9 @@ def crear2(baseD):
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
          campos =cn.obtener_campos3_1(slect_t)     # obtiene los datos de la tabla
       elif esquema=="prompts_seguridad":
-         tabla = cn.obtener_tablas3_2()
+         tabla = cn.obtener_tablas3_1()
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos3_2(slect_t)     # obtiene los datos de la tabla
+         campos =cn.obtener_campos3_1(slect_t)     # obtiene los datos de la tabla
 
     elif baseD=="chatbot_fifa":
          tabla = cn.obtener_tablas6()
@@ -116,10 +121,12 @@ def crear2(baseD):
 
             continue
         with col1 if indice % 2 == 0 else col2:
-            if "fecha" in campo.lower():
-                valores[campo] = st.date_input(f"**{campo}:**")
-            elif "dates_otros" in campo.lower():
+            if "dates_otros" in campo.lower():
                 valores[campo] = st.text_input(f"{campo}:")
+            elif "codigo_postal" in campo.lower():
+                valores[campo] = st.number_input(f"{campo}:", min_value=0, step=1)
+            elif "dates" in campo.lower():
+                valores[campo] =st.date_input(f"{campo}:")
             elif "month"  in campo.lower():
                 valores[campo] = st.selectbox(f"{campo}:", options=Opt_M)
             elif "description"  in campo.lower():
@@ -194,20 +201,48 @@ def crear2(baseD):
 
             
             if st.button("Cargar datos en la base"):
-                for _, fila in df.iterrows():
-                    valores_fila = fila[columnas_tabla].to_dict()
-                    if baseD == "test":
-                        cn.crear_registro4(slect_t, valores_fila)
-                    elif baseD == "informacion_ux":
-                        cn.crear_registro(slect_t, valores_fila)
-                    elif baseD == "eventos_cartelera":
-                        cn.crear_registro2(slect_t, valores_fila)
-                    elif baseD == "chatbot_turismo":
-                        cn.crear_registro3(slect_t, valores_fila)
-                    elif baseD == "chatbot_fifa":
-                        cn.crear_registro6(slect_t, valores_fila)
+                if df.empty:
+                    st.warning("No hay registros para cargar.")
+                else:
+                    
+                    mensaje_info = st.empty()
+                    mensaje_info.info("Normalizando datos...")
+                    barra_normalizacion = st.progress(0)
 
-                st.success("Todos los registros fueron cargados correctamente.")
+                    def actualizar_barra_normalizacion(valor):
+                        barra_normalizacion.progress(valor)
+
+                    df, log_df = normalizar_dataframe(df, actualizar_barra_normalizacion)
+                    barra_normalizacion.empty()
+                    mensaje_info.success("Normalización completada")
+                    #st.dataframe(log_df)
+
+                    
+                    mensaje_info.info("Cargando datos en la base de datos...")
+                    barra_carga = st.progress(0)
+                    total = len(df)
+
+                    for i, fila in df.iterrows():
+                        valores_fila = fila[columnas_tabla].to_dict()
+
+                        if baseD == "test":
+                            cn.crear_registro4(slect_t, valores_fila)
+                        elif baseD == "informacion_ux":
+                            cn.crear_registro(slect_t, valores_fila)
+                        elif baseD == "eventos_cartelera":
+                            cn.crear_registro(slect_t, valores_fila)
+                        elif baseD == "chatbot_turismo":
+                            cn.crear_registro3(slect_t, valores_fila)
+                        elif baseD == "chatbot_fifa":
+                            cn.crear_registro6(slect_t, valores_fila)
+
+                        progreso = int((i + 1) / total * 100)
+                        barra_carga.progress(min(progreso, 100))
+
+                    barra_carga.empty()
+                    mensaje_info.success("Carga finalizada")
+                    st.success("Todos los registros han sido cargados exitosamente.")
+
 
 
 
@@ -316,22 +351,20 @@ def modificar2(t_elec,bdatos):
         with col1 if valor_idx % 2 == 0 else col2:
             valor_actual = registro[valor_idx]
 
-            if "fecha" in campo.lower() :
-                valores[campo] = st.date_input(f"{campo}:", value=None)
-            elif "dates_otros" in campo.lower():
-                valores[campo] = st.text_input(f"{campo}:", value=valor_actual)
+            if "dates_otros" in campo.lower():
+                valores[campo] = st.text_input(f"{campo}:")
+            elif "codigo_postal" in campo.lower():
+                valores[campo] = st.number_input(f"{campo}:", min_value=0, step=1)
             elif "dates" in campo.lower():
-                valores[campo] = st.date_input(f"{campo}:", value=valor_actual)
+                valores[campo] =st.date_input(f"{campo}:", value=None)
             elif "month" in campo.lower():
                 valores[campo] = st.selectbox(f"{campo}:", options=Opt_M, index=Opt_M.index(valor_actual) if valor_actual in Opt_M else 0)
-            elif "descripcion" in campo.lower():
+            elif "description" in campo.lower():
                 valores[campo] = st.text_area(f"{campo}:", value=valor_actual, height=100, placeholder="Escribe aquí tu descripción:")
             elif "respuesta" in campo.lower():
-                valores[campo]= st.text_area( f"{campo}:", value=valor_actual, height=100)
+                valores[campo]= st.text_input( f"{campo}:", value=valor_actual)
             elif "pregunta" in campo.lower():
-                valores[campo]= st.text_area( f"{campo}:", value=valor_actual, height=100)
-            elif "codigo_postal" in campo.lower():
-                valores[campo] = st.number_input(f"{campo}:", value=int(valor_actual) if pd.notna(valor_actual) else 0, step=1)
+                valores[campo]= st.text_input( f"{campo}:", value=valor_actual)
             else:
                 valores[campo] = st.text_input(f"{campo}:", value=valor_actual)
 
@@ -593,17 +626,26 @@ def crearT(esquema):
 
             
             if st.button("Cargar datos en la base"):
-                #normalizar datos y cargar
-                #llamar a la funcion de normalizacion
-                #cargar datos en la base de datos
-                for _, fila in df.iterrows():
+                if esquema == "eventos_cartelera":
+                    df, log_df = normalizar_dataframe(df)
+                    st.info("Datos normalizados antes de cargar.")
+                    #st.dataframe(log_df)
+
+                progress_bar = st.progress(0)
+                total = len(df)
+
+                for i, fila in df.iterrows():
                     valores_fila = fila[columnas_tabla].to_dict()
                     if esquema == "categorias":
                         cn.crear_registro3(slect_t, valores_fila)
                     elif esquema == "informacion_ux":
-                        cn.crear_registro3_1(slect_t, valores_fila,esquema)
+                        cn.crear_registro3_1(slect_t, valores_fila, esquema)
                     elif esquema == "eventos_cartelera":
-                        cn.crear_registro3_1(slect_t, valores_fila,esquema)
+                        cn.crear_registro3_1(slect_t, valores_fila, esquema)
+
+                    progress_bar.progress(int((i + 1) / total * 100))
+
+                progress_bar.empty()
 
                 st.success("Todos los registros fueron cargados correctamente.")
 
@@ -647,48 +689,35 @@ def leerT(basedatos, esquema):
        edit_b = st.button("Editar")
        if edit_b:
             try:
-                 modificarT(tablas,basedatos)
+                 modificarT(tablas,esquema)
             except Exception as e:
                 st.error(f"Ocurrió un error al editar el evento: {e}")
 
 @st.dialog("Modificar",width="large")
-def modificarT(t_elec,bdatos):
+def modificarT(t_elec,squema):
     Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-    
-    if bdatos=="test":
-     campos =cn.obtener_campos4(t_elec)
-     st.write("Selecciona el campo a modificar")
-     ids = cn.editar_campo4_1(t_elec)
-     id_seleccionado = st.selectbox("Selecciona un ID", ids)
-     registro= cn.obtener_registro_id4(id_seleccionado,t_elec,campos)
 
-    elif bdatos=="informacion_ux":
-      campos =cn.obtener_campos(t_elec)
-      st.write("Selecciona el campo a modificar")
-      ids = cn.editar_campo(t_elec)
-      id_seleccionado = st.selectbox("Selecciona un ID", ids)
-      registro= cn.obtener_registro_id(id_seleccionado,t_elec,campos)
-   
-    elif bdatos=="eventos_cartelera":
-      campos =cn.obtener_campos2(t_elec)
-      st.write("Selecciona el campo a modificar")
-      ids = cn.editar_campo2(t_elec)
-      id_seleccionado = st.selectbox("Selecciona un ID", ids)
-      registro= cn.obtener_registro_id2(id_seleccionado,t_elec,campos)
+    if squema=="categorias":
+        campos =cn.obtener_campos3(t_elec)
+        st.write("Selecciona el campo a modificar")
+        ids = cn.editar_campo3(t_elec)
+        id_seleccionado = st.selectbox("Selecciona un ID", ids)
+        registro= cn.obtener_registro_id3(id_seleccionado,t_elec,campos)
 
-    elif bdatos=="chatbot_turismo":
-      campos =cn.obtener_campos3(t_elec)
-      st.write("Selecciona el campo a modificar")
-      ids = cn.editar_campo3(t_elec)
-      id_seleccionado = st.selectbox("Selecciona un ID", ids)
-      registro= cn.obtener_registro_id3(id_seleccionado,t_elec,campos)
-    elif bdatos=="chatbot_fifa":
-      campos =cn.obtener_campos6(t_elec)
-      st.write("Selecciona el campo a modificar")
-      ids = cn.editar_campo6(t_elec)
-      id_seleccionado = st.selectbox("Selecciona un ID", ids)
-      registro= cn.obtener_registro_id6(id_seleccionado,t_elec,campos)
+    elif squema=="preguntas_frecuentes":
+        campos =cn.obtener_campos3_1(t_elec,squema)
+        st.write("Selecciona el campo a modificar")
+        ids = cn.editar_campo3_1(t_elec,squema)
+        id_seleccionado = st.selectbox("Selecciona un ID", ids)
+        registro= cn.obtener_registro_id3_1(id_seleccionado,t_elec,campos,squema)
 
+    elif squema=="prompts_seguridad":
+        campos =cn.obtener_campos3_1(t_elec,squema)
+        st.write("Selecciona el campo a modificar")
+        ids = cn.editar_campo3_1(t_elec,squema)
+        id_seleccionado = st.selectbox("Selecciona un ID", ids)
+        registro= cn.obtener_registro_id3_1(id_seleccionado,t_elec,campos,squema) 
+        
     else:
         st.text("seleciona una base de datos valida")
     
@@ -724,31 +753,22 @@ def modificarT(t_elec,bdatos):
     G_b= st.button("Guardar cambios")
     if G_b:
 
-        if bdatos=="test":
-         cn.actualizar_registro5(t_elec,id_seleccionado,valores)
-         st.success("Registro actualizado correctamente")
-
-
-        elif bdatos=="informacion_ux":
-         cn.actualizar_registro(t_elec,id_seleccionado,valores)
-         st.success("Registro actualizado correctamente")
-        
-        
-        elif bdatos=="eventos_cartelera":
-         cn.actualizar_registro2(t_elec,id_seleccionado,valores)
-         st.success("Registro actualizado correctamente")
-        
-        
-        elif bdatos=="chatbot_turismo":
+        if squema=="categorias":
          cn.actualizar_registro3(t_elec,id_seleccionado,valores)
          st.success("Registro actualizado correctamente")
 
-        elif bdatos=="chatbot_fifa":
-         cn.actualizar_registro6(t_elec,id_seleccionado,valores)
-         st.success("Registro actualizado correctamente")
 
+        elif squema=="preguntas_frecuentes":
+         cn.actualizar_registro3_1(t_elec,id_seleccionado,valores,squema)
+         st.success("Registro actualizado correctamente")
+        
+        
+        elif squema=="prompts_seguridad":
+         cn.actualizar_registro3_1(t_elec,id_seleccionado,valores,squema)
+         st.success("Registro actualizado correctamente")
+        
         else:
-             st.text("seleciona una base de datos valida")
+             st.text("selecciona un esquema valido")
 
     
 
