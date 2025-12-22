@@ -1,6 +1,9 @@
 import streamlit as st
 import json
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import hashes
+
 import conexion2 as cn 
 
 
@@ -48,8 +51,8 @@ def log_in():
 
                     
                     if validar_llaves(private_key_bytes, public_key_pem, password_bytes):
-                        tunnel = cn.crear_tunel(private_key_bytes, clave_pass if clave_pass else None)
-                        st.session_state["tunnel"] = tunnel
+                       # tunnel = cn.crear_tunel(private_key_bytes, clave_pass if clave_pass else None)
+                        #st.session_state["tunnel"] = tunnel
                         st.session_state["usuario"] = usuario
                         st.session_state["rol"] = user_data["rol"]
                         st.success("¡Inicio de sesión exitoso!")
@@ -89,12 +92,27 @@ def obtener_rol_actual():
 
 
 def validar_llaves(privada_bytes, publica_bytes, password_bytes=None):
-    private_key = serialization.load_ssh_private_key(privada_bytes, password=password_bytes)
-    public_key = serialization.load_ssh_public_key(publica_bytes)
-    mensaje = b"inicio de secion comprobado"
-    firma = private_key.sign(mensaje)
     try:
+        private_key = serialization.load_ssh_private_key(privada_bytes, password=password_bytes)
+        public_key = serialization.load_ssh_public_key(publica_bytes)
+        mensaje = b"inicio de secion comprobado"
+
+        # Detecta el tipo de llave y firma correctamente
+        if hasattr(private_key, "sign"):
+            if private_key.__class__.__name__ == "Ed25519PrivateKey":
+                firma = private_key.sign(mensaje)
+            else:
+                firma = private_key.sign(
+                    mensaje,
+                    padding.PKCS1v15(),
+                    hashes.SHA256()
+                )
+        else:
+            return False
+
         public_key.verify(firma, mensaje)
         return True
-    except Exception:
+
+    except Exception as e:
+        print(f"Error en validación de llaves: {e}")
         return False

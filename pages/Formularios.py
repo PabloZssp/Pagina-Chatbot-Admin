@@ -84,23 +84,7 @@ def crear2(baseD):
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
          campos =cn.obtener_campos2(slect_t)
     
-    elif baseD=="chatbot_turismo":
-        
-      esquema =st.selectbox("Elige un esquema", options=["categorias","preguntas_frecuentes","prompts_seguridad"])
-        
-      if esquema=="categorias":
-         tabla = cn.obtener_tablas3()
-         slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos3(slect_t)     # obtiene los datos de la tabla
-      elif esquema=="preguntas_frecuentes":
-         tabla = cn.obtener_tablas3_1()
-         slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos3_1(slect_t)     # obtiene los datos de la tabla
-      elif esquema=="prompts_seguridad":
-         tabla = cn.obtener_tablas3_1()
-         slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos3_1(slect_t)     # obtiene los datos de la tabla
-
+    
     elif baseD=="chatbot_fifa":
          tabla = cn.obtener_tablas6()
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
@@ -131,6 +115,8 @@ def crear2(baseD):
                 valores[campo] = st.selectbox(f"{campo}:", options=Opt_M)
             elif "descripcion"  in campo.lower():
                 valores[campo] =st.text_area(f"{campo}:",height=100,placeholder="Escribe aqui tu descrpcion:")
+            elif "hora"  in campo.lower():
+                valores[campo] = st.time_input(f"{campo}:")
             else:
                 valores[campo] = st.text_input(f"{campo}:")
         indice +=1
@@ -145,16 +131,9 @@ def crear2(baseD):
                  cn.crear_registro(slect_t, valores)
                  st.success("Registro guardado exitosamente")     
             elif baseD=="eventos_cartelera":
-                 cn.crear_registro(slect_t, valores)
+                 cn.crear_registro2(slect_t, valores)
                  st.success("Registro guardado exitosamente")
-            elif baseD=="chatbot_turismo":
-                 if esquema=="categorias":
-                    cn.crear_registro3(slect_t, valores)
-                 elif esquema=="preguntas_frecuentes":
-                    cn.crear_registro3_1(slect_t, valores)
-                 elif esquema=="prompts_seguridad":
-                    cn.crear_registro3_2(slect_t, valores)   
-                 st.success("Registro guardado exitosamente")
+            
             elif baseD=="chatbot_fifa":
                  cn.crear_registro6(slect_t,valores)
                  st.success("Registro guardado exitosamente")
@@ -197,49 +176,67 @@ def crear2(baseD):
                 st.write("Vista previa de los datos:")
                 st.dataframe(df.head())
 
-            
-            if st.button("Cargar datos en la base"):
-                if df.empty:
-                    st.warning("No hay registros para cargar.")
-                else:
-                    
-                    mensaje_info = st.empty()
-                    mensaje_info.info("Normalizando datos...")
-                    barra_normalizacion = st.progress(0)
+                
+                if st.button("Cargar datos en la base"):
+                    if df.empty:
+                        st.warning("No hay registros para cargar.")
+                    else:
+                        
+                        mensaje_info = st.empty()
+                        mensaje_info.info("Normalizando datos...")
+                        barra_normalizacion = st.progress(0)
 
-                    def actualizar_barra_normalizacion(valor):
-                        barra_normalizacion.progress(valor)
+                        def actualizar_barra_normalizacion(valor):
+                            barra_normalizacion.progress(valor)
 
-                    df, log_df = normalizar_dataframe(df, actualizar_barra_normalizacion)
-                    barra_normalizacion.empty()
-                    mensaje_info.success("Normalización completada")
-                    #st.dataframe(log_df)
+                        df, log_df = normalizar_dataframe(df, actualizar_barra_normalizacion)
+                        barra_normalizacion.empty()
+                        mensaje_info.success("Normalización completada")
+                        #st.dataframe(log_df)
 
-                    
-                    mensaje_info.info("Cargando datos en la base de datos...")
-                    barra_carga = st.progress(0)
-                    total = len(df)
+                        
+                        mensaje_info.info("Cargando datos en la base de datos...")
+                        barra_carga = st.progress(0)
+                        total = len(df)
+                        errores = []
+                        cargados = 0
 
-                    for i, fila in df.iterrows():
-                        valores_fila = fila[columnas_tabla].to_dict()
+                        for i, fila in df.iterrows():
+                            valores_fila = fila[columnas_tabla].to_dict()
+                            ok = False
+                            try:
+                                if baseD == "test":
+                                    ok = cn.crear_registro4(slect_t, valores_fila)
+                                elif baseD == "informacion_ux":
+                                    ok = cn.crear_registro(slect_t, valores_fila)
+                                elif baseD == "eventos_cartelera":
+                                    ok = cn.crear_registro2(slect_t, valores_fila)
+                                elif baseD == "chatbot_turismo":
+                                    ok = cn.crear_registro3(slect_t, valores_fila)
+                                elif baseD == "chatbot_fifa":
+                                    ok = cn.crear_registro6(slect_t, valores_fila)
 
-                        if baseD == "test":
-                            cn.crear_registro4(slect_t, valores_fila)
-                        elif baseD == "informacion_ux":
-                            cn.crear_registro(slect_t, valores_fila)
-                        elif baseD == "eventos_cartelera":
-                            cn.crear_registro(slect_t, valores_fila)
-                        elif baseD == "chatbot_turismo":
-                            cn.crear_registro3(slect_t, valores_fila)
-                        elif baseD == "chatbot_fifa":
-                            cn.crear_registro6(slect_t, valores_fila)
+                                if ok:
+                                    cargados += 1
+                                else:
+                                    errores.append((i, "No se insertó el registro"))
+                            except Exception as e:
+                                errores.append((i, str(e)))
 
-                        progreso = int((i + 1) / total * 100)
-                        barra_carga.progress(min(progreso, 100))
 
-                    barra_carga.empty()
-                    mensaje_info.success("Carga finalizada")
-                    st.success("Todos los registros han sido cargados exitosamente.")
+                            progreso = int((i + 1) / total * 100)
+                            barra_carga.progress(min(progreso, 100))
+
+                        barra_carga.empty()
+                        mensaje_info.success("Carga finalizada")
+
+                        if errores:
+                            st.warning(f"Se cargaron {cargados} registros, pero {len(errores)} fallaron.")
+                            for idx, err in errores:
+                                st.write(f"Fila {idx}: {err}")
+                        else:
+                            st.success("Todos los registros han sido cargados exitosamente.")
+
 
 
 

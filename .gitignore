@@ -7,3 +7,8 @@ requirements.txt
 .dockerignore
 docker-compose.yml
 nginx.conf
+__pycache__
+Herramientas.cpython-313.pyc
+conexion2.cpython-313.pyc
+pages/__pycache__
+normalizacion.cpython-313.pyc
