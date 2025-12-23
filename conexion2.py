@@ -29,16 +29,15 @@ DB_NAMEF = os.getenv("DB_NAMEF")
 
 
 DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEU}"
-DATABASE_URL2 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEC}"
+DATABASE_URL2 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEC}"
 DATABASE_URL3 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMET}"
-DATABASE_URL6 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEF}"
-
+DATABASE_URL6 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEF}"
 
 
 engine = create_engine(DATABASE_URL)
 engine2 = create_engine(DATABASE_URL2)
-engine10 = create_engine(DATABASE_URL3)
-engine9 = create_engine(DATABASE_URL6)
+engine3 = create_engine(DATABASE_URL3)
+engine4 = create_engine(DATABASE_URL6)
 
 
 
@@ -55,7 +54,7 @@ engine4 = create_engine(DATABASE_URL4)
 ############################ UX ################ 
 def obtener_eventos(tabla):
     query = f"SELECT * FROM {tabla} ORDER BY id ASC"
-    with engine.connect() as conn:
+    with engine8.connect() as conn:
         result = conn.execute(text(query))
         rows = result.fetchall()
     return rows
@@ -63,7 +62,7 @@ def obtener_eventos(tabla):
 
 def editar_campo(t_seleccion):
     query = text(f"SELECT id FROM {t_seleccion} ORDER BY id")
-    with engine.connect() as conn:
+    with engine8.connect() as conn:
         result = conn.execute(query)
         ids = [row[0] for row in result.fetchall()]
     return ids
@@ -80,11 +79,12 @@ def crear_registro(tabla, valores):
     query = text(f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})")
 
     try:
-        with engine.begin() as conn:
+        with engine8.begin() as conn:
             conn.execute(query, valores)  # valores es un dict
+            return True
     except Exception as e:
         print(f"Error al insertar registro: {e}")
-
+        return False
         
 
 
@@ -96,7 +96,7 @@ def obtener_registro_id(id_evento, t_Select, campos):
         FROM {t_Select} WHERE id = :id_evento
     """)
 
-    with engine.connect() as conn:
+    with engine8.connect() as conn:
         result = conn.execute(query, {"id_evento": id_evento})
         evento = result.fetchone()
 
@@ -108,7 +108,7 @@ def actualizar_registro(tabla, id_registro, nuevos_valores):
 
     nuevos_valores["id"] = id_registro
 
-    with engine5.connect() as conn:
+    with engine8.connect() as conn:
         conn.execute(query, nuevos_valores)
         conn.commit()
 
@@ -132,7 +132,7 @@ def obtener_campos(tabla):
         AND table_name = :tabla
         ORDER BY ordinal_position;
     """)
-    with engine.connect() as conn:
+    with engine8.connect() as conn:
         columnas = [row[0] for row in conn.execute(query, {"tabla": tabla})]
     return {col: col for col in columnas}
 
@@ -140,7 +140,7 @@ def obtener_campos(tabla):
 
 def eliminar_campo(tabla, id):
     query = text(f"DELETE FROM {tabla} WHERE id = :id")
-    with engine5.connect() as conn:
+    with engine.connect() as conn:
         trans = conn.begin()
         try:
             conn.execute(query, {'id': id})
@@ -152,7 +152,7 @@ def eliminar_campo(tabla, id):
 #################################Cultura##################################
 def obtener_eventos2(tabla):
     query = f"SELECT * FROM {tabla} ORDER BY id ASC"
-    with engine2.connect() as conn:
+    with engine7.connect() as conn:
         result = conn.execute(text(query))
         rows = result.fetchall()
     return rows
@@ -160,7 +160,7 @@ def obtener_eventos2(tabla):
 
 def editar_campo2(t_seleccion):
     query = text(f"SELECT id FROM {t_seleccion} ORDER BY id")
-    with engine2.connect() as conn:
+    with engine7.connect() as conn:
         result = conn.execute(query)
         ids = [row[0] for row in result.fetchall()]
     return ids
@@ -177,10 +177,12 @@ def crear_registro2(tabla, valores):
     query = text(f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})")
 
     try:
-        with engine2.begin() as conn:
+        with engine7.begin() as conn:
             conn.execute(query, valores)  # valores es un dict
+            return True
     except Exception as e:
         print(f"Error al insertar registro: {e}")
+        return False
 
 def obtener_registro_id2(id_evento, t_Select, campos):
     columnas = ", ".join(campos)  # convierte la lista en texto SQL válido
@@ -190,7 +192,7 @@ def obtener_registro_id2(id_evento, t_Select, campos):
         FROM {t_Select} WHERE id = :id_evento
     """)
 
-    with engine2.connect() as conn:
+    with engine7.connect() as conn:
         result = conn.execute(query, {"id_evento": id_evento})
         evento = result.fetchone()
 
@@ -202,7 +204,7 @@ def actualizar_registro2(tabla, id_registro, nuevos_valores):
 
     nuevos_valores["id"] = id_registro
 
-    with engine2.connect() as conn:
+    with engine7.connect() as conn:
         conn.execute(query, nuevos_valores)
         conn.commit()
 
@@ -214,7 +216,7 @@ def obtener_tablas2():
         AND table_name NOT ILIKE '%copy%'
         ORDER BY table_name;
     """)
-    with engine2.connect() as conn:
+    with engine7.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
 
@@ -228,7 +230,7 @@ def obtener_campos2(tabla):
         AND table_name = :tabla
         ORDER BY ordinal_position;
     """)
-    with engine2.connect() as conn:
+    with engine7.connect() as conn:
         columnas = [row[0] for row in conn.execute(query, {"tabla": tabla})]
     return {col: col for col in columnas}
 
@@ -236,7 +238,7 @@ def obtener_campos2(tabla):
 
 def eliminar_campo2(tabla, id):
     query = text(f"DELETE FROM {tabla} WHERE id = :id")
-    with engine2.connect() as conn:
+    with engine7.connect() as conn:
         trans = conn.begin()
         try:
             conn.execute(query, {'id': id})
@@ -282,7 +284,7 @@ def obtener_eventos3(tabla):
 
     query = text(f'SELECT * FROM categorias."{tabla}" ORDER BY {nombre_id} ASC')
 
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         result = conn.execute(query)
         rows = result.fetchall()
 
@@ -322,7 +324,7 @@ def editar_campo3(t_seleccion):
         raise ValueError(f"No se encontró campo ID para la tabla '{t_seleccion}'")
 
     query = text(f'SELECT {campo_id} FROM categorias."{t_seleccion}" ORDER BY {campo_id}')
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         result = conn.execute(query)
         ids = [row[0] for row in result.fetchall()]
     return ids
@@ -347,10 +349,12 @@ def crear_registro3(tabla, valores):
     """)
 
     try:
-        with engine10.begin() as conn:
+        with engine3.begin() as conn:
             conn.execute(query, valores)
+            return True
     except Exception as e:
         print(f" Error al insertar registro en '{tabla}': {e}")
+        return False
 
 
 def obtener_registro_id3(id_evento, t_Select, campos):
@@ -393,7 +397,7 @@ def obtener_registro_id3(id_evento, t_Select, campos):
         WHERE {columna_id} = :id_evento
     """)
 
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         result = conn.execute(query, {"id_evento": id_evento})
         evento = result.fetchone()
 
@@ -444,7 +448,7 @@ def actualizar_registro3(tabla, id_registro, nuevos_valores):
 
     nuevos_valores["id_registro"] = id_registro
 
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         conn.execute(query, {"id_registro":id_registro},nuevos_valores)
         conn.commit()
 
@@ -459,7 +463,7 @@ def obtener_tablas3():
         ORDER BY table_name;
 
     """)
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
 
@@ -473,7 +477,7 @@ def obtener_campos3(tabla):
         AND table_name = :tabla
         ORDER BY ordinal_position;
     """)
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         columnas = [row[0] for row in conn.execute(query, {"tabla": tabla})]
     return {col: col for col in columnas}
 
@@ -513,7 +517,7 @@ def eliminar_campo3(tabla, id):
 
     query = text(f"""DELETE FROM "categorias"."{tabla}"
                   WHERE "{columna_id}" = :id""")
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         trans = conn.begin()
         try:
             conn.execute(query, {'id': id})
@@ -521,10 +525,58 @@ def eliminar_campo3(tabla, id):
         except Exception as e:
             trans.rollback()
             print(f"Error al eliminar el registro: {e}")
+
+########################Editar varrios campos##########################
+def obtener_categorias3(tabla,squema):
+    query = text (f"""SELECT DISTINCT category 
+                    FROM {squema}.{tabla}
+    """)
+    with engine3.connect() as conn:
+        result = conn.execute(query)
+        rows = result.fetchall()
+    return rows
+
+
+def obtener_registros_por_categoria3(tabla, categoria,esquema):
+    query = text(f"""
+        SELECT id, title, category, pregunta, respuesta
+        FROM {esquema}.{tabla}
+        WHERE category = :categoria
+        ORDER BY id
+    """)
+    with engine3.connect() as conn:
+        result = conn.execute(query, {"categoria": categoria})
+        return result.fetchall()
+
+
+def actualizar_registro_cat_3(tabla, fila, esquema):
+    """
+    fila: pandas.Series (una fila del DataFrame)
+    """
+    id_registro = fila["id"]
+
+    # columnas a actualizar (todas menos id)
+    columnas = [col for col in fila.index if col != "id"]
+
+    set_clause = ", ".join([f"{col} = :{col}" for col in columnas])
+
+    query = text(f"""
+        UPDATE {esquema}.{tabla}
+        SET {set_clause}
+        WHERE id = :id
+    """)
+
+    params = {col: fila[col] for col in columnas}
+    params["id"] = id_registro
+
+    with engine3.connect() as conn:
+        conn.execute(query, params)
+        conn.commit()
+
 #####################otros esquemas ########################
 def obtener_eventos3_1(tabla,esquema):
     query = f"SELECT * FROM {esquema}.{tabla} ORDER BY id ASC"
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         result = conn.execute(text(query))
         rows = result.fetchall()
     return rows
@@ -532,7 +584,7 @@ def obtener_eventos3_1(tabla,esquema):
 
 def editar_campo3_1(t_seleccion,esquema):
     query = text(f"SELECT id FROM {esquema}.{t_seleccion} ORDER BY id")
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         result = conn.execute(query)
         ids = [row[0] for row in result.fetchall()]
     return ids
@@ -549,10 +601,12 @@ def crear_registro3_1(tabla, valores,esquema):
     query = text(f"INSERT INTO {esquema}.{tabla} ({columnas_sql}) VALUES ({placeholders})")
 
     try:
-        with engine10.begin() as conn:
-            conn.execute(query, valores)  # valores es un dict
+        with engine3.begin() as conn:
+            conn.execute(query, valores) 
+            return True  # valores es un dict
     except Exception as e:
         print(f"Error al insertar registro: {e}")
+        return False
 
 def obtener_registro_id3_1(id_evento, t_Select, campos,esquema):
     columnas = ", ".join(campos)  # convierte la lista en texto SQL válido
@@ -562,7 +616,7 @@ def obtener_registro_id3_1(id_evento, t_Select, campos,esquema):
         FROM {esquema}.{t_Select} WHERE id = :id_evento
     """)
 
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         result = conn.execute(query, {"id_evento": id_evento})
         evento = result.fetchone()
 
@@ -576,7 +630,7 @@ def actualizar_registro3_1(tabla, id_registro, nuevos_valores):
 
         nuevos_valores["id"] = id_registro
 
-        with engine10.connect() as conn:
+        with engine3.connect() as conn:
             conn.execute(query, nuevos_valores)
             conn.commit()
 
@@ -590,7 +644,7 @@ def obtener_tablas3_1(esquema):
         WHERE table_schema = :esquema
         ORDER BY table_name;
     """)
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         tablas = [row[0] for row in conn.execute(query, {"esquema": esquema})]
     return {tabla: tabla for tabla in tablas}
 
@@ -603,7 +657,7 @@ def obtener_campos3_1(tabla,esquema):
         AND table_name = :tabla
         ORDER BY ordinal_position;
     """)
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         columnas = [row[0] for row in conn.execute(query, {"tabla": tabla, "esquema": esquema})]
     return {col: col for col in columnas}
 
@@ -611,7 +665,7 @@ def obtener_campos3_1(tabla,esquema):
 
 def eliminar_campo3_1(tabla, id,esquema):
     query = text(f"DELETE FROM {esquema}.{tabla} WHERE id = :id")
-    with engine10.connect() as conn:
+    with engine3.connect() as conn:
         trans = conn.begin()
         try:
             conn.execute(query, {'id': id})
@@ -629,6 +683,51 @@ def obtener_eventos4_1(tabla):
         result = conn.execute(text(query))
         rows = result.fetchall()
     return rows
+
+def obtener_categorias4_1(tabla):
+    query = text (f"""SELECT DISTINCT category
+                    FROM herramientas.{tabla}
+    """)
+    with engine4.connect() as conn:
+        result = conn.execute(query)
+        rows = result.fetchall()
+    return rows
+def obtener_registros_por_categoria(tabla, categoria):
+    query = text(f"""
+        SELECT id, title, category, pregunta, respuesta
+        FROM herramientas.{tabla}
+        WHERE category = :categoria
+        ORDER BY id
+    """)
+    with engine4.connect() as conn:
+        result = conn.execute(query, {"categoria": categoria})
+        return result.fetchall()
+
+
+def actualizar_registro4_1(tabla, fila):
+    """
+    fila: pandas.Series (una fila del DataFrame)
+    """
+    id_registro = fila["id"]
+
+    # columnas a actualizar (todas menos id)
+    columnas = [col for col in fila.index if col != "id"]
+
+    set_clause = ", ".join([f"{col} = :{col}" for col in columnas])
+
+    query = text(f"""
+        UPDATE herramientas.{tabla}
+        SET {set_clause}
+        WHERE id = :id
+    """)
+
+    params = {col: fila[col] for col in columnas}
+    params["id"] = id_registro
+
+    with engine4.connect() as conn:
+        conn.execute(query, params)
+        conn.commit()
+
 
 
 def editar_campo4_1(t_seleccion):
@@ -656,11 +755,12 @@ def crear_registro4(tabla, valores):
     try:
         with engine4.begin() as conn:
             conn.execute(query, valores_limpios)
+            return True
     except Exception as e:
         print(f"Error al insertar registro: {e}")
+        return False
 
         
-
 
 def obtener_registro_id4(id_evento, t_Select, campos):
     columnas = ", ".join(campos)  # convierte la lista en texto SQL válido
@@ -796,17 +896,13 @@ SSH_PKEY = os.getenv("SSH_PKEY")
 SSH_PKEY_PASS = os.getenv("SSH_PKEY_PASS")
 
 DBS_USER = os.getenv("DBS_USER")
+DBS_USERU = os.getenv("DBS_USERU")
+DBS_USERT = os.getenv("DBS_USERT")
+DBS_USERF = os.getenv("DBS_USERF")
 DBS_PASSWORD = os.getenv("DBS_PASSWORD")
 DBS_NAME = os.getenv("DBS_NAMET")
 DBS_PORT = int(os.getenv("DBS_PORT"))
 DBS_HOST = os.getenv("DBS_HOST")
-DATABASE_S_URL = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEU}"
-DATABASE_S_URLT = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMET}"
-DATABASE_S_URLF = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEF}"
-
-engine5 = create_engine(DATABASE_S_URL)
-engine10 = create_engine(DATABASE_S_URLT)
-engine9 = create_engine(DATABASE_S_URLF)
 
 
 ####################################
@@ -897,265 +993,16 @@ def crear_tunel(clave_privada_bytes, clave_pass=None):
 ###############################
 ########Conexion BDS############
 ###############################
+DATABASE_S_URLC = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/db_gchat_ecartelera"
+DATABASE_S_URL = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/db_gchat_cartelerainfoux"
+DATABASE_S_URLT = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMET}"
+DATABASE_S_URLF = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEF}"
 
+engine7 = create_engine(DATABASE_S_URLC)
+engine8 = create_engine(DATABASE_S_URL)
+engine10 = create_engine(DATABASE_S_URLT)
+engine9 = create_engine(DATABASE_S_URLF)
 
-def obtener_eventos5(tabla):
-    campos_id = {
-        'Arte_publico_monumentos': 'id_monumento',
-        'Bibliotecas_archivos':'id_biblioteca',
-        'Barrios_colonias': 'id_barrio',
-        'Centros_culturales': 'id_centro',
-        'Edificios_historicos':'id_edificio',
-        'Embajadas': 'id_embajada',
-        'Estaciones_de_metro': 'id_estacion',
-        'Galerias_de_arte':'id_galeria',
-        'Gran_aforo': 'id_aforo',
-        'Hoteles': 'id_hotel',
-        'Iglecias_catedrales':'id_iglecia',
-        'Ir_de_compras': 'id_plaza_comer',
-        'Mercados': 'id_mercado',
-        'Miradores':'id_mirador',
-        'Museos': 'id_museo',
-        'Parques_plazas_publicas': 'id_parque',
-        'Restaurantes':'id_rest',
-        'sitios_arqueologico': 'id_sitios',
-        'cat_hotel_estrellas': 'id_estrella',
-        'cat_restaurantes_estrellas':'id_estrella',
-        
-    }
-
-    nombre_id = campos_id.get(tabla)
-    if not nombre_id:
-        raise ValueError(f"No se encontró campo ID para la tabla '{tabla}'")
-
-    query = text(f'SELECT * FROM categorias."{tabla}" ORDER BY {nombre_id} ASC')
-
-    with engine5.connect() as conn:
-        result = conn.execute(query)
-        rows = result.fetchall()
-
-    return rows
-
-
-def editar_campo5(t_seleccion):
-    campos_id = {
-        'Arte_publico_monumentos': 'id_monumento',
-        'Bibliotecas_archivos':'id_biblioteca',
-        'Barrios_colonias': 'id_barrio',
-        'Centros_culturales': 'id_centro',
-        'Edificios_historicos':'id_edificio',
-        'Embajadas': 'id_embajada',
-        'Estaciones_de_metro': 'id_estacion',
-        'Galerias_de_arte':'id_galeria',
-        'Gran_aforo': 'id_aforo',
-        'Hoteles': 'id_hotel',
-        'Iglecias_catedrales':'id_iglecia',
-        'Ir_de_compras': 'id_plaza_comer',
-        'Mercados': 'id_mercado',
-        'Miradores':'id_mirador',
-        'Museos': 'id_museo',
-        'Parques_plazas_publicas': 'id_parque',
-        'Restaurantes':'id_rest',
-        'sitios_arqueologico': 'id_sitio',
-        'cat_hotel_estrellas': 'id_estrella',
-        'cat_restaurantes_estrellas':'id_estrella',
-        
-    }
-
-    
-    campo_id = campos_id.get(t_seleccion)
-    if not campo_id:
-        raise ValueError(f"No se encontró campo ID para la tabla '{t_seleccion}'")
-
-    query = text(f'SELECT {campo_id} FROM categorias."{t_seleccion}" ORDER BY {campo_id}')
-    with engine5.connect() as conn:
-        result = conn.execute(query)
-        ids = [row[0] for row in result.fetchall()]
-    return ids
-
-
-def crear_registro5(tabla, valores):
-    if not tabla or not valores:
-        raise ValueError("Tabla y valores no pueden estar vacíos.")
-
-    
-    tabla_sql = f'"{tabla}"' if not tabla.islower() else tabla
-
-    columnas = list(valores.keys())
-
-    
-    columnas_sql = ", ".join([f'"{col}"' for col in columnas])
-    placeholders = ", ".join([f":{col}" for col in columnas])
-
-    query = text(f"""
-        INSERT INTO categorias.{tabla_sql} ({columnas_sql})
-        VALUES ({placeholders})
-    """)
-
-    try:
-        with engine5.begin() as conn:
-            conn.execute(query, valores)
-    except Exception as e:
-        print(f" Error al insertar registro en '{tabla}': {e}")
-
-
-def obtener_registro_id5(id_evento, t_Select, campos):
-    campos_id = {
-        'Arte_publico_monumentos': 'id_monumento',
-        'Bibliotecas_archivos': 'id_biblioteca',
-        'Barrios_colonias': 'id_barrio',
-        'Centros_culturales': 'id_centro',
-        'Edificios_historicos': 'id_edificio',
-        'Embajadas': 'id_embajada',
-        'Estaciones_de_metro': 'id_estacion',
-        'Galerias_de_arte': 'id_galeria',
-        'Gran_aforo': 'id_aforo',
-        'Hoteles': 'id_hotel',
-        'Iglecias_catedrales': 'id_iglecia',
-        'Ir_de_compras': 'id_plaza_comer',
-        'Mercados': 'id_mercado',
-        'Miradores': 'id_mirador',
-        'Museos': 'id_museo',
-        'Parques_plazas_publicas': 'id_parque',
-        'Restaurantes': 'id_rest',
-        'sitios_arqueologico': 'id_sitio',
-        'cat_hotel_estrellas': 'id_estrella',
-        'cat_restaurantes_estrellas': 'id_estrella',
-    }
-
-    columna_id = campos_id.get(t_Select)
-    if not columna_id:
-        raise ValueError(f"No se encontró columna ID para la tabla '{t_Select}'")
-
-    
-    columnas_sql = ", ".join([f'"{col}"' if not col.islower() else col for col in campos])
-
-    query = text(f"""
-        SELECT {columnas_sql}
-        FROM categorias."{t_Select}"
-        WHERE {columna_id} = :id_evento
-    """)
-
-    with engine5.connect() as conn:
-        result = conn.execute(query, {"id_evento": id_evento})
-        evento = result.fetchone()
-
-    return evento
-
-
-
-def actualizar_registro5(tabla, id_registro, nuevos_valores):
-    campos_id = {
-        'Arte_publico_monumentos': 'id_monumento',
-        'Bibliotecas_archivos': 'id_biblioteca',
-        'Barrios_colonias': 'id_barrio',
-        'Centros_culturales': 'id_centro',
-        'Edificios_historicos': 'id_edificio',
-        'Embajadas': 'id_embajada',
-        'Estaciones_de_metro': 'id_estacion',
-        'Galerias_de_arte': 'id_galeria',
-        'Gran_aforo': 'id_aforo',
-        'Hoteles': 'id_hotel',
-        'Iglecias_catedrales': 'id_iglecia',
-        'Ir_de_compras': 'id_plaza_comer',
-        'Mercados': 'id_mercado',
-        'Miradores': 'id_mirador',
-        'Museos': 'id_museo',
-        'Parques_plazas_publicas': 'id_parque',
-        'Restaurantes': 'id_rest',
-        'sitios_arqueologico': 'id_sitio',
-        'cat_hotel_estrellas': 'id_estrella',
-        'cat_restaurantes_estrellas': 'id_estrella',
-    }
-
-    columna_id = campos_id.get(tabla)
-    if not columna_id:
-        raise ValueError(f"No se encontró columna ID para la tabla '{tabla}'")
-
-    
-    set_clause = ", ".join([f'"{campo}" = :{campo}' for campo in nuevos_valores])
-
-    query = text(f"""
-    UPDATE "categorias"."{tabla}"
-    SET {set_clause}
-    WHERE "{columna_id}" = :id_registro;
-      """)
-
-
-    params = {"id_registro": id_registro}
-    params.update(nuevos_valores)
-
-    with engine5.connect() as conn:
-        conn.execute(query, params)
-        conn.commit()
-
-
-def obtener_tablas5():
-    query = text("""
-        SELECT table_name
-        FROM information_schema.tables
-        WHERE table_schema = 'categorias'
-        ORDER BY table_name;
-    """)
-    with engine5.connect() as conn:
-        tablas = [row[0] for row in conn.execute(query)]
-    return {tabla: tabla for tabla in tablas}
-
-
-
-def obtener_campos5(tabla):
-    query = text(f"""
-        SELECT column_name
-        FROM information_schema.columns
-        WHERE table_schema = 'categorias'
-        AND table_name = '{tabla}'
-        ORDER BY ordinal_position;
-    """)
-    with engine5.connect() as conn:
-        columnas = [row[0] for row in conn.execute(query)]
-    return {col: col for col in columnas}
-
-
-
-
-def eliminar_campo5(tabla, id):
-    campos_id = {
-        'Arte_publico_monumentos': 'id_monumento',
-        'Bibliotecas_archivos': 'id_biblioteca',
-        'Barrios_colonias': 'id_barrio',
-        'Centros_culturales': 'id_centro',
-        'Edificios_historicos': 'id_edificio',
-        'Embajadas': 'id_embajada',
-        'Estaciones_de_metro': 'id_estacion',
-        'Galerias_de_arte': 'id_galeria',
-        'Gran_aforo': 'id_aforo',
-        'Hoteles': 'id_hotel',
-        'Iglecias_catedrales': 'id_iglecia',
-        'Ir_de_compras': 'id_plaza_comer',
-        'Mercados': 'id_mercado',
-        'Miradores': 'id_mirador',
-        'Museos': 'id_museo',
-        'Parques_plazas_publicas': 'id_parque',
-        'Restaurantes': 'id_rest',
-        'sitios_arqueologico': 'id_sitio',
-        'cat_hotel_estrellas': 'id_estrella',
-        'cat_restaurantes_estrellas': 'id_estrella',
-    }
-
-    columna_id = campos_id.get(tabla)
-    if not columna_id:
-        raise ValueError(f"No se encontró columna ID para la tabla '{tabla}'")
-
-    query = text(f"""DELETE FROM "categorias"."{tabla}"
-                  WHERE "{columna_id}" = :id""")
-    with engine5.connect() as conn:
-        trans = conn.begin()
-        try:
-            conn.execute(query, {'id': id})
-            trans.commit()
-        except Exception as e:
-            trans.rollback()
-            print(f"Error al eliminar el registro: {e}")
 
 
 ################ FIFA ##############
@@ -1187,10 +1034,11 @@ def crear_registro6(tabla, valores):
 
     try:
         with engine9.begin() as conn:
-            conn.execute(query, valores)  # valores es un dict
+            conn.execute(query, valores)
+            return True  # valores es un dict
     except Exception as e:
         print(f"Error al insertar registro: {e}")
-
+        return False
 def obtener_registro_id6(id_evento, t_Select, campos):
     columnas = ", ".join(campos)  # convierte la lista en texto SQL válido
 

@@ -31,13 +31,13 @@ def MenuPrincipal():
             st.page_link("pages/MENU_BD.py",label= "TEST")
 
         elif st.session_state["rol"] in ["usuario", "usuarioUX", "usuarioCl", "usuarioTU"]:
-            st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🤖")
+            st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🏠")
             st.page_link("pages/Formularios.py", label="Componentes", icon="📝")
             #st.page_link("pages/MENU_BD.py", label="TEST")
             #st.page_link("pages/Chatbot.py", label="Gráficas", icon="📊")
             #st.page_link("pages/log.py", label="login")
         else:
-            st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🤖")
+            st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🏠")
         Ex_b = st.button("Salir")
         if Ex_b:
             l.log_out()
