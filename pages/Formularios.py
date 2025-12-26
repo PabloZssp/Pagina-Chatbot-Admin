@@ -691,80 +691,138 @@ def leerT(basedatos, esquema):
 @st.dialog("Modificar",width="large")
 def modificarT(t_elec,squema):
     Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-
     if squema=="categorias":
-        campos =cn.obtener_campos3(t_elec)
-        st.write("Selecciona el campo a modificar")
-        ids = cn.editar_campo3(t_elec)
-        id_seleccionado = st.selectbox("Selecciona un ID", ids)
-        registro= cn.obtener_registro_id3(id_seleccionado,t_elec,campos)
-
+        opcionT = "Un registro"
     elif squema=="preguntas_frecuentes":
-        campos =cn.obtener_campos3_1(t_elec,squema)
-        st.write("Selecciona el campo a modificar")
-        ids = cn.editar_campo3_1(t_elec,squema)
-        id_seleccionado = st.selectbox("Selecciona un ID", ids)
-        registro= cn.obtener_registro_id3_1(id_seleccionado,t_elec,campos,squema)
-
+        opcionT = st.selectbox("Escoge una opción", options=["Un registro","Varios registros"])
     elif squema=="prompts_seguridad":
-        campos =cn.obtener_campos3_1(t_elec,squema)
-        st.write("Selecciona el campo a modificar")
-        ids = cn.editar_campo3_1(t_elec,squema)
-        id_seleccionado = st.selectbox("Selecciona un ID", ids)
-        registro= cn.obtener_registro_id3_1(id_seleccionado,t_elec,campos,squema) 
-        
+        opcionT = "Un registro"
     else:
-        st.text("seleciona una base de datos valida")
-    
+        st.text("Esquema no valido")
 
-    
-    col1, col2 = st.columns(2)
+    st.text(f"esquema seleccionado: {squema}")
+    if opcionT == "Un registro":
 
-    
-    valores = {}
+        campos = None
+        registro = None
+        id_seleccionado = None
 
-    valor_idx = 0
+        if squema == "categorias":
+            campos = cn.obtener_campos3(t_elec)
+            ids = cn.editar_campo3(t_elec)
+            id_seleccionado = st.selectbox("Selecciona un ID", ids)
+            registro = cn.obtener_registro_id3(id_seleccionado, t_elec, campos)
 
-    for campo in campos:
-        
-        with col1 if valor_idx % 2 == 0 else col2:
-            valor_actual = registro[valor_idx]
+        elif squema == "preguntas_frecuentes":
+            campos = cn.obtener_campos3_1(t_elec, squema)
+            ids = cn.editar_campo3_1(t_elec, squema)
+            id_seleccionado = st.selectbox("Selecciona un ID", ids)
+            registro = cn.obtener_registro_id3_1(id_seleccionado, t_elec, campos, squema)
 
-            if "fecha" in campo.lower() or "dates" in campo.lower():
-                valores[campo] = st.date_input(f"{campo}:", value=None)
-            elif "month" in campo.lower():
-                valores[campo] = st.selectbox(f"{campo}:", options=Opt_M, index=Opt_M.index(valor_actual) if valor_actual in Opt_M else 0)
-            elif "descripcion" in campo.lower():
-                valores[campo] = st.text_area(f"{campo}:", value=valor_actual, height=100, placeholder="Escribe aquí tu descripción:")
-            elif "respuesta" in campo.lower():
-                valores[campo]= st.text_area( f"{campo}:", value=valor_actual, height=100)
-            elif "pregunta" in campo.lower():
-                valores[campo]= st.text_area( f"{campo}:", value=valor_actual, height=100)
-            else:
-                valores[campo] = st.text_input(f"{campo}:", value=valor_actual)
+        elif squema == "prompts_seguridad":
+            campos = cn.obtener_campos3_1(t_elec, squema)
+            ids = cn.editar_campo3_1(t_elec, squema)
+            id_seleccionado = st.selectbox("Selecciona un ID", ids)
+            registro = cn.obtener_registro_id3_1(id_seleccionado, t_elec, campos, squema)
 
-        valor_idx += 1
-    st.text(f"tabla: {t_elec}")    
-    G_b= st.button("Guardar cambios")
-    if G_b:
-
-        if squema=="categorias":
-         cn.actualizar_registro3(t_elec,id_seleccionado,valores)
-         st.success("Registro actualizado correctamente")
-
-
-        elif squema=="preguntas_frecuentes":
-         cn.actualizar_registro3_1(t_elec,id_seleccionado,valores,squema)
-         st.success("Registro actualizado correctamente")
-        
-        
-        elif squema=="prompts_seguridad":
-         cn.actualizar_registro3_1(t_elec,id_seleccionado,valores,squema)
-         st.success("Registro actualizado correctamente")
-        
         else:
-             st.text("selecciona un esquema valido")
+            st.warning("Selecciona un esquema válido")
 
+        
+        if campos and registro:
+
+            col1, col2 = st.columns(2)
+            valores = {}
+            valor_idx = 0
+
+            for campo in campos:
+                with col1 if valor_idx % 2 == 0 else col2:
+                    valor_actual = registro[valor_idx]
+
+                    if "fecha" in campo.lower() or "dates" in campo.lower():
+                        valores[campo] = st.date_input(f"{campo}:", value=None)
+                    elif "month" in campo.lower():
+                        valores[campo] = st.selectbox(
+                            f"{campo}:",
+                            options=Opt_M,
+                            index=Opt_M.index(valor_actual) if valor_actual in Opt_M else 0
+                        )
+                    elif campo.lower() in {"descripcion", "respuesta", "pregunta"}:
+                        valores[campo] = st.text_area(f"{campo}:", value=valor_actual, height=100)
+                    else:
+                        valores[campo] = st.text_input(f"{campo}:", value=valor_actual)
+
+                valor_idx += 1
+
+            if st.button("Guardar cambios"):
+                if squema == "categorias":
+                    cn.actualizar_registro3(t_elec, id_seleccionado, valores)
+                    st.success("Registro actualizado correctamente")
+                    
+                elif squema=="preguntas_frecuentes":
+                    cn.actualizar_registro3_1(t_elec,id_seleccionado,valores,squema)
+                    st.success("Registro actualizado correctamente")
+
+                elif squema=="prompts_seguridad":
+                    cn.actualizar_registro3_1(t_elec,id_seleccionado,valores,squema)
+                    st.success("Registro actualizado correctamente")
+                
+                else:
+                    st.text("selecciona un esquema valido")
+    elif opcionT == "Varios registros":
+        if squema=="preguntas_frecuentes":
+            st.write(t_elec)
+
+            # 1. Obtener categorías
+            regop = cn.obtener_categorias3(t_elec,squema)
+            st.write("Categorías disponibles:", regop)
+
+            opciones = [r[0] for r in regop]
+
+            division = st.selectbox(
+                "Selecciona una categoría",
+                options=opciones
+            )
+
+            # 2. Obtener registros de esa categoría
+            registros = cn.obtener_registros_por_categoria3(t_elec, division,squema)
+
+            st.write(f"Registros en la categoría: {division}")
+
+            # 3. Mostrar tabla editable
+            if registros:
+                df = pd.DataFrame(
+                    registros,
+                    columns=["id", "title", "category", "pregunta", "respuesta"]
+                )
+
+                edited_df = st.data_editor(df, num_rows="dynamic")
+
+                # 4. Guardar cambios
+                if st.button("Guardar cambios"):
+                    for _, row in edited_df.iterrows():
+                        cn.actualizar_registro_cat_3(t_elec, row, squema)
+
+                    st.success("Registros actualizados correctamente ✅")
+            else:
+                st.warning("No se encontraron registros para esta categoría.")
+
+#        elif squema=="preguntas_frecuentes":
+ #           campos =cn.obtener_campos3_1(t_elec,squema)
+#            st.write("Selecciona el campo a modificar")
+  #          ids = cn.editar_campo3_1(t_elec,squema)
+   #         id_seleccionado = st.selectbox("Selecciona un ID", ids)
+    #        registro= cn.obtener_registro_id3_1(id_seleccionado,t_elec,campos,squema)
+
+        elif squema=="prompts_seguridad":
+            campos =cn.obtener_campos3_1(t_elec,squema)
+            st.write("Selecciona el campo a modificar")
+            ids = cn.editar_campo3_1(t_elec,squema)
+            id_seleccionado = st.selectbox("Selecciona un ID", ids)
+            registro= cn.obtener_registro_id3_1(id_seleccionado,t_elec,campos,squema) 
+            
+        else:
+            st.text("seleciona una base de datos valida")
     
 
 @st.dialog("Eliminar",width="large")    
