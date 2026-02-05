@@ -695,6 +695,8 @@ def modificarT(t_elec,squema):
         opcionT = "Un registro"
     elif squema=="preguntas_frecuentes":
         opcionT = st.selectbox("Escoge una opción", options=["Un registro","Varios registros"])
+    elif squema=="prompts_seguridad":
+        opcionT = "Un registro"
     else:
         st.text("Esquema no valido")
 
@@ -821,7 +823,6 @@ def modificarT(t_elec,squema):
             
         else:
             st.text("seleciona una base de datos valida")
-
     
 
 @st.dialog("Eliminar",width="large")    
