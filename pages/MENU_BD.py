@@ -4,16 +4,17 @@ import Herramientas as h
 import conexion2 as cn
 import log
 import requests
+from dotenv import load_dotenv
+import os
 
 h.verificar_sesion()
 h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
+load_dotenv()
 
 # --- CONFIGURACIÓN ---
-TOKEN = "8402168574:AAFWVA_D6lpIFXd1gp7Qxbe9U9WRtb-6kcM"  # 🔒 Tu token del bot de BotFather
-CHAT_ID = "-4859403477"   # 🧠 Tu chat_id (o el del grupo donde está el bot)
-#MENSAJE_PING = "Activado"    # Mensaje que el bot se enviará a sí mismo
-INTERVALO =   1800       # Tiempo entre mensajes en segundos (3600 = 1 hora)
+TOKEN = os.getenv("TELEGRAM_TOKEN")  
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")   
 URL = f"https://api.telegram.org/bot{TOKEN}/"
 
 
