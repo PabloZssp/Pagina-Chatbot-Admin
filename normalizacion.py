@@ -69,14 +69,7 @@ def normalizar_categoria(cat):
                 return categoria_normal
     return cat.title()
 
-def validar_fecha(fecha):
-    if pd.isna(fecha) or fecha == "":
-        return "REVISAR MANUALMENTE"
-    try:
-        fecha_obj = datetime.strptime(fecha, "%Y-%m-%d")
-        return fecha_obj.strftime("%Y-%m-%d")
-    except:
-        return "FORMATO INVALIDO"
+
 
 def normalizar_dataframe(df,actualizar_barra=None):
     log_cambios = []
@@ -85,27 +78,23 @@ def normalizar_dataframe(df,actualizar_barra=None):
     for i, row in df.iterrows():
         original_title = row.get("title", "")
         original_cat = row.get("category", "")
-        original_date = row.get("dates", "")
         original_url = row.get("url", "")
         id_evento = row.get("id", i)
 
         nuevo_title = limpiar_texto(original_title)
         nuevo_cat = normalizar_categoria(original_cat)
-        nuevo_date = validar_fecha(original_date)
+        
         nuevo_url = limpiar_url(original_url)
 
         if nuevo_title != original_title:
             log_cambios.append([id_evento, "title", original_title, nuevo_title])
         if nuevo_cat != original_cat:
             log_cambios.append([id_evento, "category", original_cat, nuevo_cat])
-        if nuevo_date != original_date:
-            log_cambios.append([id_evento, "dates", original_date, nuevo_date])
         if nuevo_url != original_url:
             log_cambios.append([id_evento, "url", original_url, nuevo_url])
 
         df.at[i, "title"] = nuevo_title
         df.at[i, "category"] = nuevo_cat
-        df.at[i, "dates"] = nuevo_date
         df.at[i, "url"] = nuevo_url
         if actualizar_barra:
             actualizar_barra(int((i + 1) / total * 100))

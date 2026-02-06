@@ -216,12 +216,13 @@ def obtener_tablas2():
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'public'
-        AND table_name NOT ILIKE '%copy%'
+        AND table_name = 'eventos_cdmx'
         ORDER BY table_name;
     """)
     with engine7.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
+
 
 
 def obtener_campos2(tabla):
@@ -262,6 +263,7 @@ def obtener_eventos3(tabla):
         'Centros_culturales': 'id_centro',
         'Cartelera_dia_de_muertos_2025':'id_evento',
         'Eventos_turisticos_2025':'id_evento',
+        'Eventos_turisticos_2026':'id',
         'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
@@ -302,6 +304,7 @@ def editar_campo3(t_seleccion):
         'Centros_culturales': 'id_centro',
         'Cartelera_dia_de_muertos_2025':'id_evento',
         'Eventos_turisticos_2025':'id_evento',
+        'Eventos_turisticos_2026':'id',
         'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
@@ -368,6 +371,7 @@ def obtener_registro_id3(id_evento, t_Select, campos):
         'Centros_culturales': 'id_centro',
         'Cartelera_dia_de_muertos_2025':'id_evento',
         'Eventos_turisticos_2025':'id_evento',
+        'Eventos_turisticos_2026':'id',
         'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
@@ -416,6 +420,7 @@ def actualizar_registro3(tabla, id_registro, nuevos_valores):
         'Centros_culturales': 'id_centro',
         'Cartelera_dia_de_muertos_2025':'id_evento',
         'Eventos_turisticos_2025':'id_evento',
+        'Eventos_turisticos_2026':'id',
         'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
@@ -495,6 +500,7 @@ def eliminar_campo3(tabla, id):
         'Centros_culturales': 'id_centro',
         'Cartelera_dia_de_muertos_2025':'id_evento',
         'Eventos_turisticos_2025':'id_evento',
+        'Eventos_turisticos_2026':'id',
         'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
