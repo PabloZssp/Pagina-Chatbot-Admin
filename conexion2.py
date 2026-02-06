@@ -32,9 +32,9 @@ DB_NAMEF = os.getenv("DB_NAMEF")
 
 
 DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEU}"
-DATABASE_URL2 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEC}"
+DATABASE_URL2 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEC}"
 DATABASE_URL3 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMET}"
-DATABASE_URL6 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEF}"
+DATABASE_URL6 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEF}"
 
 
 engine = create_engine(DATABASE_URL)
@@ -155,7 +155,7 @@ def eliminar_campo(tabla, id):
 #################################Cultura##################################
 def obtener_eventos2(tabla):
     query = f"SELECT * FROM {tabla} ORDER BY id ASC"
-    with engine7.connect() as conn:
+    with engine2.connect() as conn:
         result = conn.execute(text(query))
         rows = result.fetchall()
     return rows
@@ -163,7 +163,7 @@ def obtener_eventos2(tabla):
 
 def editar_campo2(t_seleccion):
     query = text(f"SELECT id FROM {t_seleccion} ORDER BY id")
-    with engine7.connect() as conn:
+    with engine2.connect() as conn:
         result = conn.execute(query)
         ids = [row[0] for row in result.fetchall()]
     return ids
@@ -180,7 +180,7 @@ def crear_registro2(tabla, valores):
     query = text(f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})")
 
     try:
-        with engine7.begin() as conn:
+        with engine2.begin() as conn:
             conn.execute(query, valores)  # valores es un dict
             return True
     except Exception as e:
@@ -195,7 +195,7 @@ def obtener_registro_id2(id_evento, t_Select, campos):
         FROM {t_Select} WHERE id = :id_evento
     """)
 
-    with engine7.connect() as conn:
+    with engine2.connect() as conn:
         result = conn.execute(query, {"id_evento": id_evento})
         evento = result.fetchone()
 
@@ -207,7 +207,7 @@ def actualizar_registro2(tabla, id_registro, nuevos_valores):
 
     nuevos_valores["id"] = id_registro
 
-    with engine7.connect() as conn:
+    with engine2.connect() as conn:
         conn.execute(query, nuevos_valores)
         conn.commit()
 
@@ -219,7 +219,7 @@ def obtener_tablas2():
         AND table_name NOT ILIKE '%copy%'
         ORDER BY table_name;
     """)
-    with engine7.connect() as conn:
+    with engine2.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
 
@@ -233,7 +233,7 @@ def obtener_campos2(tabla):
         AND table_name = :tabla
         ORDER BY ordinal_position;
     """)
-    with engine7.connect() as conn:
+    with engine2.connect() as conn:
         columnas = [row[0] for row in conn.execute(query, {"tabla": tabla})]
     return {col: col for col in columnas}
 
@@ -241,7 +241,7 @@ def obtener_campos2(tabla):
 
 def eliminar_campo2(tabla, id):
     query = text(f"DELETE FROM {tabla} WHERE id = :id")
-    with engine7.connect() as conn:
+    with engine2.connect() as conn:
         trans = conn.begin()
         try:
             conn.execute(query, {'id': id})
@@ -1000,7 +1000,7 @@ DATABASE_S_URL = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:654
 DATABASE_S_URLT = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMET}"
 DATABASE_S_URLF = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEF}"
 
-engine7 = create_engine(DATABASE_S_URLC)
+engine2 = create_engine(DATABASE_S_URLC)
 engine8 = create_engine(DATABASE_S_URL)
 engine10 = create_engine(DATABASE_S_URLT)
 engine9 = create_engine(DATABASE_S_URLF)
