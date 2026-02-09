@@ -29,9 +29,9 @@ DB_NAMEF = os.getenv("DB_NAMEF")
 
 
 DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEU}"
-DATABASE_URL2 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEC}"
+DATABASE_URL2 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEC}"
 DATABASE_URL3 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMET}"
-DATABASE_URL6 = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@{DBS_HOST}:{DBS_PORT}/{DBS_NAMEF}"
+DATABASE_URL6 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEF}"
 
 
 engine = create_engine(DATABASE_URL)
@@ -213,12 +213,13 @@ def obtener_tablas2():
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'public'
-        AND table_name NOT ILIKE '%copy%'
+        AND table_name = 'eventos_cdmx'
         ORDER BY table_name;
     """)
     with engine2.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
+
 
 
 def obtener_campos2(tabla):
@@ -411,9 +412,10 @@ def actualizar_registro3(tabla, id_registro, nuevos_valores):
         'Bibliotecas_archivos':'id_biblioteca',
         'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
-        'Cartelera_dia_de_muertos_2025': 'id_evento',
-        'Eventos_turisticos_2025': 'id_evento',
-        'Edificios_historicos': 'id_edificio',
+        'Cartelera_dia_de_muertos_2025':'id_evento',
+        'Eventos_turisticos_2025':'id_evento',
+        'Eventos_turisticos_2026':'id',
+        'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
         'Galerias_de_arte':'id_galeria',
@@ -490,9 +492,10 @@ def eliminar_campo3(tabla, id):
         'Bibliotecas_archivos':'id_biblioteca',
         'Barrios_colonias': 'id_barrio',
         'Centros_culturales': 'id_centro',
-        'Cartelera_dia_de_muertos_2025': 'id_evento',
-        'Eventos_turisticos_2025': 'id_evento',
-        'Edificios_historicos': 'id_edificio',
+        'Cartelera_dia_de_muertos_2025':'id_evento',
+        'Eventos_turisticos_2025':'id_evento',
+        'Eventos_turisticos_2026':'id',
+        'Edificios_historicos':'id_edificio',
         'Embajadas': 'id_embajada',
         'Estaciones_de_metro': 'id_estacion',
         'Galerias_de_arte':'id_galeria',
@@ -998,7 +1001,7 @@ DATABASE_S_URL = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:654
 DATABASE_S_URLT = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMET}"
 DATABASE_S_URLF = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEF}"
 
-engine7 = create_engine(DATABASE_S_URLC)
+engine2 = create_engine(DATABASE_S_URLC)
 engine8 = create_engine(DATABASE_S_URL)
 engine10 = create_engine(DATABASE_S_URLT)
 engine9 = create_engine(DATABASE_S_URLF)
