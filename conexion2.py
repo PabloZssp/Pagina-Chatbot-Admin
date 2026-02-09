@@ -1,11 +1,10 @@
 from sqlalchemy import create_engine,text
 from dotenv import load_dotenv
 import os
-from sshtunnel import SSHTunnelForwarder
 import paramiko
-import streamlit as st
-
 from io import StringIO
+import requests
+
 
 # Cargar variables del archivo .env
 load_dotenv()
@@ -467,7 +466,7 @@ def obtener_tablas3():
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'categorias'
-        AND table_name NOT ILIKE '%copy%'
+        AND table_name NOT LIKE '%copy%'
         ORDER BY table_name;
 
     """)
@@ -610,7 +609,7 @@ def crear_registro3_1(tabla, valores,esquema):
     query = text(f"INSERT INTO {esquema}.{tabla} ({columnas_sql}) VALUES ({placeholders})")
 
     try:
-        with engine3.begin() as conn:
+        with engine10.begin() as conn:
             conn.execute(query, valores) 
             return True  # valores es un dict
     except Exception as e:
@@ -631,17 +630,18 @@ def obtener_registro_id3_1(id_evento, t_Select, campos,esquema):
 
     return evento
 
-
-def actualizar_registro3_1(tabla, id_registro, nuevos_valores, esquema):
+def actualizar_registro3_1(tabla, id_registro, nuevos_valores):
     try:
+        
         set_clause = ", ".join([f"{campo} = :{campo}" for campo in nuevos_valores])
-        query = text(f"UPDATE {esquema}.{tabla} SET {set_clause} WHERE id = :id")
+        query = text(f"UPDATE {tabla} SET {set_clause} WHERE id = :id")
 
         nuevos_valores["id"] = id_registro
 
         with engine10.connect() as conn:
             conn.execute(query, nuevos_valores)
             conn.commit()
+
     except Exception as e:
         print("Error al actualizar:", e)
 
@@ -1107,3 +1107,32 @@ def eliminar_campo6(tabla, id):
         except Exception as e:
             trans.rollback()
             print(f"Error al eliminar el registro: {e}")
+
+
+#####Telegram######
+TOKEN = os.getenv("TELEGRAM_TOKEN")  
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")   
+URL = f"https://api.telegram.org/bot{TOKEN}/"
+
+
+#funcion de enviar archivos a telegram v1
+def enviar_archivo_telegram(archivo):
+    """
+    Envía el archivo subido en Streamlit directamente a Telegram.
+    """
+    url_documento = f"https://api.telegram.org/bot{TOKEN}/sendDocument"
+    
+    
+    files = {
+        'document': (archivo.name, archivo.getvalue())
+    }
+    data = {
+        'chat_id': CHAT_ID,
+        'caption': f"Aqui tienes el archivo : {archivo.name}"
+    }
+
+    try:
+        response = requests.post(url_documento, data=data, files=files)
+        
+    except Exception as e:
+        os.error(f"Error de conexión: {e}")

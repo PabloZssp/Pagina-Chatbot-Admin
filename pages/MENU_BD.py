@@ -4,17 +4,22 @@ import Herramientas as h
 import conexion2 as cn
 import log
 import requests
+from dotenv import load_dotenv
+import os
+
 
 h.verificar_sesion()
 h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
+load_dotenv()
 
 # --- CONFIGURACIÓN ---
-TOKEN = "8402168574:AAFWVA_D6lpIFXd1gp7Qxbe9U9WRtb-6kcM"  # 🔒 Tu token del bot de BotFather
-CHAT_ID = "-4859403477"   # 🧠 Tu chat_id (o el del grupo donde está el bot)
-#MENSAJE_PING = "Activado"    # Mensaje que el bot se enviará a sí mismo
-INTERVALO =   1800       # Tiempo entre mensajes en segundos (3600 = 1 hora)
+TOKEN = os.getenv("TELEGRAM_TOKEN")  
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")   
 URL = f"https://api.telegram.org/bot{TOKEN}/"
+
+
+
 
 
 def menu_BD():
@@ -47,13 +52,15 @@ def menu_BD():
         opciones2(Bdatos)
 
     elif Bdatos == "chatbot_turismo":        
-        if rol=="administrador":
-            opcionesMT =[" ","categorias","preguntas_frecuentes","prompts_seguridad"]
+        if rol == "administrador":
+            opciones = [" ", "categorias", "preguntas_frecuentes", "prompts_seguridad"]
         else:
-            opcionesMT =[" ","categorias","preguntas_frecuentes"]
-        squma =st.selectbox("Elige un esquema", options=opcionesMT)
+            opciones = [" ", "categorias", "preguntas_frecuentes"]
+
+        squma = st.selectbox("Elige un esquema", options=opciones)
+
         if squma != " ":
-         opcionesT(Bdatos,squma)
+            opcionesT(Bdatos, squma)
 
     elif Bdatos == "test":        
         opciones2(Bdatos)
@@ -313,11 +320,19 @@ def crear2(baseD):
     df = None
 
     if archivo is not None:
-        if archivo.name.endswith(".csv"):
+        nombre = archivo.name
+
+        if nombre.endswith(".csv"):
             try:
                 df = pd.read_csv(archivo, encoding='utf-8')
             except UnicodeDecodeError:
-                df = pd.read_csv(archivo, encoding='latin-1')
+                try:
+                    df = pd.read_csv(archivo, encoding='latin1')
+                except Exception as e:
+                    st.error(f"No se pudo leer el archivo CSV: {e}")
+                    df = None
+        elif nombre.endswith(".xlsx"):
+            df = pd.read_excel(archivo)
         else:
             df =pd.read_excel(archivo)
         
@@ -353,13 +368,19 @@ def crear2(baseD):
                     elif baseD == "eventos_cartelera":
                         cn.crear_registro2(slect_t, valores_fila)
                     elif baseD == "chatbot_turismo":
-                        cn.crear_registro3(slect_t, valores_fila)
+                        if esquema=="categorias":
+                            cn.crear_registro3(slect_t, valores_fila)
+                        elif esquema=="preguntas_frecuentes":
+                            cn.crear_registro3_1(slect_t, valores_fila,esquema)
+                        elif esquema=="prompts_seguridad":
+                            cn.crear_registro3_2(slect_t, valores_fila,esquema)   
+                        st.success("Registro guardado exitosamente")
                     elif baseD == "chatbot_fifa":
                         cn.crear_registro6(slect_t, valores_fila)
 
                 st.success("Todos los registros fueron cargados correctamente.")
             
-            enviar_archivo_telegram(archivo)
+            cn.enviar_archivo_telegram(archivo)
 
 
 
@@ -716,6 +737,7 @@ def enviar_archivo_telegram(archivo):
     except Exception as e:
         st.error(f"Error de conexión: {e}")
 
+
 @st.dialog("Crear", width="large")
 def crearT(esquema):
     Opt_M = [" ", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -764,7 +786,7 @@ def crearT(esquema):
             elif esquema=="preguntas_frecuentes":
              cn.crear_registro3_1(slect_t, valores,esquema)
             elif esquema=="prompts_seguridad":
-             cn.crear_registro3_1(slect_t, valores,esquema)
+             cn.crear_registro3_2(slect_t, valores,esquema)
              st.success("Registro guardado exitosamente")
             
             else:
@@ -830,11 +852,11 @@ def crearT(esquema):
                     elif esquema == "preguntas_frecuentes":
                         cn.crear_registro3_1(slect_t, valores_fila,esquema)
                     elif esquema == "prompts_seguridad":
-                        cn.crear_registro3_1(slect_t, valores_fila,esquema)
+                        cn.crear_registro3_2(slect_t, valores_fila,esquema)
 
                 st.success("Todos los registros fueron cargados correctamente.")
             if st.button("Enviar archivo a Telegram"):
-                enviar_archivo_telegram(archivo)
+                cn.enviar_archivo_telegram(archivo)
 
 
 def selec_compT(tabla,esquema):
@@ -1083,16 +1105,14 @@ def eliminarT(esquema):
         
     b_El = st.button("Eliminar registro")
     if b_El:
-
+        
          if esquema=="categorias":
           cn.eliminar_campo3(t_selec,id_seleccionado)
           st.success("Registro eliminado exitosamente.") 
-
-
+         
          elif esquema=="preguntas_frecuentes":
           cn.eliminar_campo3_1(t_selec,id_seleccionado,esquema)
-          st.success("Registro eliminado exitosamente.") 
-          
+          st.success("Registro eliminado exitosamente.")        
         
          elif esquema=="prompts_seguridad":
           cn.eliminar_campo3_1(t_selec,id_seleccionado,esquema)

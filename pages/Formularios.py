@@ -113,12 +113,12 @@ def crear2(baseD):
                 valores[campo] =st.date_input(f"{campo}:")
             elif "month"  in campo.lower():
                 valores[campo] = st.selectbox(f"{campo}:", options=Opt_M)
-            elif "descripcion"  in campo.lower():
+            elif "description"  in campo.lower():
                 valores[campo] =st.text_area(f"{campo}:",height=100,placeholder="Escribe aqui tu descrpcion:")
             elif "hora"  in campo.lower():
                 valores[campo] = st.time_input(f"{campo}:")
             else:
-                valores[campo] = st.text_input(f"{campo}:")
+               valores[campo] = st.text_input(f"{campo}:")
         indice +=1
 
     if st.button("Guardar registro", key="guardar_registro"):
@@ -598,7 +598,7 @@ def crearT(esquema):
         else:
             st.error("Formato no soportado.")
             df = None
-
+        
         if df is not None:
             columnas_archivo = list(df.columns)
             columnas_tabla = [c for c in campos if not c.lower().startswith("id")]
