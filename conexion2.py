@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import os
 import paramiko
 from io import StringIO
+import requests
+
 
 # Cargar variables del archivo .env
 load_dotenv()
@@ -1102,3 +1104,32 @@ def eliminar_campo6(tabla, id):
         except Exception as e:
             trans.rollback()
             print(f"Error al eliminar el registro: {e}")
+
+
+#####Telegram######
+TOKEN = os.getenv("TELEGRAM_TOKEN")  
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")   
+URL = f"https://api.telegram.org/bot{TOKEN}/"
+
+
+#funcion de enviar archivos a telegram v1
+def enviar_archivo_telegram(archivo):
+    """
+    Envía el archivo subido en Streamlit directamente a Telegram.
+    """
+    url_documento = f"https://api.telegram.org/bot{TOKEN}/sendDocument"
+    
+    
+    files = {
+        'document': (archivo.name, archivo.getvalue())
+    }
+    data = {
+        'chat_id': CHAT_ID,
+        'caption': f"Aqui tienes el archivo : {archivo.name}"
+    }
+
+    try:
+        response = requests.post(url_documento, data=data, files=files)
+        
+    except Exception as e:
+        os.error(f"Error de conexión: {e}")

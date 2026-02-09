@@ -3,19 +3,13 @@ import pandas as pd
 import Herramientas as h  
 import conexion2 as cn
 import log
-import requests
-from dotenv import load_dotenv
-import os
+
 
 h.verificar_sesion()
 h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
-load_dotenv()
 
-# --- CONFIGURACIÓN ---
-TOKEN = os.getenv("TELEGRAM_TOKEN")  
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")   
-URL = f"https://api.telegram.org/bot{TOKEN}/"
+
 
 
 def menu_BD():
@@ -376,7 +370,7 @@ def crear2(baseD):
 
                 st.success("Todos los registros fueron cargados correctamente.")
             
-            enviar_archivo_telegram(archivo)
+            cn.enviar_archivo_telegram(archivo)
 
 
 
@@ -711,27 +705,7 @@ def opcionesT(Bdatos, esquema):
         leerT(Bdatos,esquema)     
     elif opcion == "Eliminar":
         eliminarT(esquema)
-#funcion de enviar archivos a telegram v1
-def enviar_archivo_telegram(archivo):
-    """
-    Envía el archivo subido en Streamlit directamente a Telegram.
-    """
-    url_documento = f"https://api.telegram.org/bot{TOKEN}/sendDocument"
-    
-    
-    files = {
-        'document': (archivo.name, archivo.getvalue())
-    }
-    data = {
-        'chat_id': CHAT_ID,
-        'caption': f"Aqui tienes el archivo : {archivo.name}"
-    }
 
-    try:
-        response = requests.post(url_documento, data=data, files=files)
-        
-    except Exception as e:
-        st.error(f"Error de conexión: {e}")
 
 @st.dialog("Crear", width="large")
 def crearT(esquema):
@@ -851,7 +825,7 @@ def crearT(esquema):
 
                 st.success("Todos los registros fueron cargados correctamente.")
             if st.button("Enviar archivo a Telegram"):
-                enviar_archivo_telegram(archivo)
+                cn.enviar_archivo_telegram(archivo)
 
 
 def selec_compT(tabla,esquema):
