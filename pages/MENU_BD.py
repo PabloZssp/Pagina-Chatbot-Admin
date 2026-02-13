@@ -565,7 +565,7 @@ def modificar2(t_elec,bdatos):
                             row["pregunta"],
                             row["respuesta"]
                         )
-                    st.success("Registros actualizados correctamente ✅")
+                    st.success("Registros actualizados correctamente ")
             else:
                 st.warning("No se encontraron registros para esta categoría.")
 

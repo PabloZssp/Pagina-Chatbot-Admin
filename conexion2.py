@@ -56,7 +56,7 @@ engine4 = create_engine(DATABASE_URL4)
 ############################ UX ################ 
 def obtener_eventos(tabla):
     query = f"SELECT * FROM {tabla} ORDER BY id ASC"
-    with engine8.connect() as conn:
+    with engine2.connect() as conn:
         result = conn.execute(text(query))
         rows = result.fetchall()
     return rows
@@ -64,7 +64,7 @@ def obtener_eventos(tabla):
 
 def editar_campo(t_seleccion):
     query = text(f"SELECT id FROM {t_seleccion} ORDER BY id")
-    with engine8.connect() as conn:
+    with engine2.connect() as conn:
         result = conn.execute(query)
         ids = [row[0] for row in result.fetchall()]
     return ids
@@ -81,7 +81,7 @@ def crear_registro(tabla, valores):
     query = text(f"INSERT INTO {tabla} ({columnas_sql}) VALUES ({placeholders})")
 
     try:
-        with engine8.begin() as conn:
+        with engine2.begin() as conn:
             conn.execute(query, valores)  # valores es un dict
             return True
     except Exception as e:
@@ -98,7 +98,7 @@ def obtener_registro_id(id_evento, t_Select, campos):
         FROM {t_Select} WHERE id = :id_evento
     """)
 
-    with engine8.connect() as conn:
+    with engine2.connect() as conn:
         result = conn.execute(query, {"id_evento": id_evento})
         evento = result.fetchone()
 
@@ -110,7 +110,7 @@ def actualizar_registro(tabla, id_registro, nuevos_valores):
 
     nuevos_valores["id"] = id_registro
 
-    with engine8.connect() as conn:
+    with engine2.connect() as conn:
         conn.execute(query, nuevos_valores)
         conn.commit()
 
@@ -121,7 +121,7 @@ def obtener_tablas():
         WHERE table_schema = 'public'
         ORDER BY table_name;
     """)
-    with engine.connect() as conn:
+    with engine2.connect() as conn:
         tablas = [row[0] for row in conn.execute(query)]
     return {tabla: tabla for tabla in tablas}
 
@@ -134,7 +134,7 @@ def obtener_campos(tabla):
         AND table_name = :tabla
         ORDER BY ordinal_position;
     """)
-    with engine8.connect() as conn:
+    with engine2.connect() as conn:
         columnas = [row[0] for row in conn.execute(query, {"tabla": tabla})]
     return {col: col for col in columnas}
 
@@ -142,7 +142,7 @@ def obtener_campos(tabla):
 
 def eliminar_campo(tabla, id):
     query = text(f"DELETE FROM {tabla} WHERE id = :id")
-    with engine.connect() as conn:
+    with engine2.connect() as conn:
         trans = conn.begin()
         try:
             conn.execute(query, {'id': id})
@@ -924,31 +924,22 @@ import select
 import os
 from io import StringIO
 
-def crear_tunel(clave_privada_bytes, clave_pass=None):
+def crear_tunel():
     SSH_HOST_2 = os.getenv("SSH_SERVER", "192.168.22.9")
     SSH_USER_2 = os.getenv("SSH_USER", "um-cdmx-adip-dii-04")
     LOCAL_PORT = 6543
     REMOTE_HOST = "127.0.0.1"  # base de datos local en dii-04
     REMOTE_PORT = int(os.getenv("DBS_PORT", 5432))
 
-    print(f"Conectando a {SSH_USER_2}@{SSH_HOST_2} para crear túnel SSH...")
+    print(f"Conectando a {SSH_USER_2}@{SSH_HOST_2} con contraseña para crear túnel SSH...")
 
-    # --- Preparar la llave privada desde los bytes cargados ---
-    clave_stream = StringIO(clave_privada_bytes.decode())
-    try:
-        key = paramiko.Ed25519Key.from_private_key(clave_stream, password=clave_pass)
-    except paramiko.ssh_exception.SSHException:
-        # Si no es Ed25519, intentar con RSA
-        clave_stream.seek(0)
-        key = paramiko.RSAKey.from_private_key(clave_stream, password=clave_pass)
-
-    # --- Crear cliente SSH y conectar ---
+    # --- Crear cliente SSH y conectar con contraseña ---
     ssh2 = paramiko.SSHClient()
     ssh2.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh2.connect(
         SSH_HOST_2,
         username=SSH_USER_2,
-        pkey=key
+        password=os.getenv("SSH_PASSWORD")   # aquí usas la contraseña en lugar de la llave
     )
 
     transport2 = ssh2.get_transport()
@@ -998,12 +989,13 @@ def crear_tunel(clave_privada_bytes, clave_pass=None):
     return ssh2
 
 
+
 ###############################
 ########Conexion BDS############
 ###############################
 DATABASE_S_URLC = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/db_gchat_ecartelera"
 DATABASE_S_URL = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/db_gchat_cartelerainfoux"
-DATABASE_S_URLT = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMET}"
+DATABASE_S_URLT = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEC}"
 DATABASE_S_URLF = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEF}"
 
 engine2 = create_engine(DATABASE_S_URLC)

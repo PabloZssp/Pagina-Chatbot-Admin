@@ -236,7 +236,7 @@ def crear2(baseD):
                                 st.write(f"Fila {idx}: {err}")
                         else:
                             st.success("Todos los registros han sido cargados exitosamente.")
-
+                        cn.enviar_archivo_telegram(archivo)
 
 
 
