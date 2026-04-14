@@ -25,13 +25,13 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_NAMEU = os.getenv("DB_NAMEUX")
-DB_NAMEC = os.getenv("DB_NAMEC")
+DB_NAMECN = os.getenv("DB_NAMECN")
 DB_NAMET = os.getenv("DB_NAMET")
 DB_NAMEF = os.getenv("DB_NAMEF")
 
 
 DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEU}"
-DATABASE_URL2 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEC}"
+DATABASE_URL2 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMECN}"
 DATABASE_URL3 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMET}"
 DATABASE_URL6 = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAMEF}"
 
@@ -907,11 +907,14 @@ DBS_USER = os.getenv("DBS_USER")
 DBS_USERU = os.getenv("DBS_USERU")
 DBS_USERT = os.getenv("DBS_USERT")
 DBS_USERF = os.getenv("DBS_USERF")
-DBS_PASSWORD = os.getenv("DBS_PASSWORD")
+#DBS_PASSWORD = os.getenv("DBS_PASSWORD")
 DBS_NAME = os.getenv("DBS_NAMET")
 DBS_PORT = int(os.getenv("DBS_PORT"))
 DBS_HOST = os.getenv("DBS_HOST")
 
+from urllib.parse import quote_plus
+
+DBS_PASSWORD = quote_plus(os.getenv("DBS_PASSWORD"))
 
 ####################################
 ################tunelssh############
@@ -993,9 +996,9 @@ def crear_tunel():
 ###############################
 ########Conexion BDS############
 ###############################
-DATABASE_S_URLC = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/db_gchat_ecartelera"
-DATABASE_S_URL = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/db_gchat_cartelerainfoux"
-DATABASE_S_URLT = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEC}"
+DATABASE_S_URLC = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEC}"
+DATABASE_S_URL  = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEU}"
+DATABASE_S_URLT = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMET}"
 DATABASE_S_URLF = f"postgresql+psycopg2://{DBS_USER}:{DBS_PASSWORD}@localhost:6543/{DBS_NAMEF}"
 
 engine2 = create_engine(DATABASE_S_URLC)
