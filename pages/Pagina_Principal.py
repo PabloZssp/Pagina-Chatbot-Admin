@@ -8,8 +8,7 @@ st.set_page_config(page_title="Pagina principal", initial_sidebar_state="auto",p
 
 st.title("Panel de Administración de Datos del Chatbot")
 st.markdown("  \n ")
-st.subheader("Bienvenido al panel de administración. Aquí podrás gestionar, actualizar y mantener la base de conocimiento que " \
-"utiliza el chatbot para responder con precisión a los usuarios.")
+st.subheader("Bienvenido al panel de administración")
 with st.container():
  st.markdown(
         """
@@ -27,7 +26,7 @@ with col_2:
   #  bt_B = st.button("Ir a Gráficas")
 
 if bt_A:
-    st.switch_page("pages/Formularios.py" )#boton para ir a la pagina de formularios
+    st.switch_page("pages/Menu_nuevo.py" )#boton para ir a la pagina de formularios
 #if bt_B:
  #   st.switch_page("pages/Chatbot.py" )#boton para ir a la pagina de graficas
 

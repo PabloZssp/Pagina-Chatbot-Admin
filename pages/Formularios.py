@@ -3,8 +3,11 @@ import streamlit as st
 import pandas as pd
 import Herramientas as h  # Módulo de herramientas para links de las páginas
 import conexion2 as cn # Módulo para la conexion de la base de datos principal 
+import conexion_N as cnN # Módulo para la conexion de la base de datos del chatbot fifa
 import log 
 from normalizacion import normalizar_dataframe
+
+
 h.verificar_sesion()
 h.acceso_multiple(["administrador","usuarioUX" , "usuarioCl", "usuarioTU"])
 
@@ -36,16 +39,7 @@ def menu_BD():
     elif Bdatos == "eventos_cartelera":
              
         opciones2(Bdatos)
-
-    elif Bdatos == "chatbot_turismo":        
-        if rol=="administrador":
-            opcionesMT =[" ","categorias","preguntas_frecuentes","prompts_seguridad"]
-        else:
-            opcionesMT =[" ","categorias","preguntas_frecuentes"]
-        squma =st.selectbox("Elige un esquema", options=opcionesMT)
-        if squma != " ":
-         opcionesT(Bdatos,squma)
-
+        
     elif Bdatos == "test":        
         opciones2(Bdatos)
     elif Bdatos == "chatbot_fifa":        
@@ -70,9 +64,9 @@ def crear2(baseD):
              "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
     
     if baseD=="test":
-         tabla = cn.obtener_tablas4()
+        # tabla = cn.obtener_tablas4()
          slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos4(slect_t)
+        # campos =cn.obtener_campos4(slect_t)
          
     elif baseD=="informacion_ux":
         tabla = cn.obtener_tablas()
@@ -250,8 +244,8 @@ def selec_comp2(tabla,basedatos):
         columnas = cn.obtener_campos(tabla)         
         registros = cn.obtener_eventos(tabla)        
     elif basedatos=="eventos_cartelera":
-        columnas = cn.obtener_campos2(tabla)         
-        registros = cn.obtener_eventos2(tabla)        
+        columnas = cnN.obtener_campos6(tabla)         
+        registros = cnN.obtener_eventos6(tabla)        
     elif basedatos=="chatbot_turismo":
         columnas = cn.obtener_campos3(tabla)         
         registros = cn.obtener_eventos3(tabla) 
@@ -274,7 +268,7 @@ def leer2(basedatos):
        elif basedatos=="informacion_ux":
            diccionario_tablas= cn.obtener_tablas()
        elif basedatos=="eventos_cartelera":
-           diccionario_tablas=cn.obtener_tablas2()
+           diccionario_tablas=cnN.obtener_tablas6()
        elif basedatos=="chatbot_turismo":
            diccionario_tablas=cn.obtener_tablas3()
        elif basedatos=="chatbot_fifa":
@@ -516,399 +510,7 @@ def eliminar2(Bdatos):
          else:
              st.text("seleciona una base de datos valida")
 
-def opcionesT(Bdatos, esquema):
 
-    Menu_Sec = ["Leer","Crear" ,"Eliminar"]
-    st.subheader("Formulario")
-    opcion = st.selectbox("Selecciona una opción", options=Menu_Sec, index=0)
-
-    if opcion == "Crear":
-        crearT(esquema)
-    elif opcion == "Leer":
-        leerT(Bdatos,esquema)     
-    elif opcion == "Eliminar":
-        eliminarT(esquema)
-
-@st.dialog("Crear", width="large")
-def crearT(esquema):
-    Opt_M = [" ", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"] 
-        
-    if esquema=="categorias":
-         tabla = cn.obtener_tablas3()
-         slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos3(slect_t)     
-    elif esquema=="preguntas_frecuentes":
-         tabla = cn.obtener_tablas3_1(esquema)
-         slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos3_1(slect_t,esquema)     
-    elif esquema=="prompts_seguridad":
-         tabla = cn.obtener_tablas3_1(esquema)
-         slect_t=st.selectbox("Selecciona una tabla:",options=tabla,index=0)
-         campos =cn.obtener_campos3_1(slect_t,esquema)     
-
-
-    col1, col2 = st.columns(2)    
-    valores = {}
-
-    indice = 0  
-    
-    for  campo in campos:
-        if campo.lower() == "id"or campo.lower().startswith("id_"):
-
-            continue
-        with col1 if indice % 2 == 0 else col2:
-            if "fecha" in campo.lower():
-                valores[campo] = st.date_input(f"**{campo}:**")
-            elif "dates" in campo.lower():
-                valores[campo] =st.date_input(f"{campo}:")
-            elif "month"  in campo.lower():
-                valores[campo] = st.selectbox(f"{campo}:", options=Opt_M)
-            elif "descripcion"  in campo.lower():
-                valores[campo] =st.text_area(f"{campo}:",height=100,placeholder="Escribe aqui tu descrpcion:")
-            else:
-                valores[campo] = st.text_input(f"{campo}:")
-        indice +=1
-
-    if st.button("Guardar registro", key="guardar_registro"):
-        try:  
-            if esquema=="categorias":
-             cn.crear_registro3(slect_t, valores)
-            elif esquema=="preguntas_frecuentes":
-             cn.crear_registro3_1(slect_t, valores,esquema)
-            elif esquema=="prompts_seguridad":
-             cn.crear_registro3_1(slect_t, valores,esquema)
-             st.success("Registro guardado exitosamente")
-            
-            else:
-                st.error("selecciona una base de datos valida")
-
-        except Exception as e:
-            st.error(f"Error al guardar el registro: {e}")
-    archivo = st.file_uploader("Elige un archivo CSV o Excel", type=["csv", "xlsx"])
-    df = None
-
-    if archivo is not None:
-        nombre = archivo.name
-
-        if nombre.endswith(".csv"):
-            df = pd.read_csv(archivo)
-        elif nombre.endswith(".xlsx"):
-            df = pd.read_excel(archivo)
-        else:
-            st.error("Formato no soportado.")
-            df = None
-        
-        if df is not None:
-            columnas_archivo = list(df.columns)
-            columnas_tabla = [c for c in campos if not c.lower().startswith("id")]
-            print(columnas_tabla)
-            print(columnas_archivo)
-
-            faltantes = set(columnas_tabla) - set(columnas_archivo)
-            extras = set(columnas_archivo) - set(columnas_tabla)
-
-            if faltantes or extras:
-                st.warning(" Las columnas del archivo no coinciden con la tabla seleccionada.")
-                if faltantes:
-                    st.write(" Faltan en el archivo:", list(faltantes))
-                if extras:
-                    st.write(" Sobran en el archivo:", list(extras))
-            else:
-                st.success(" Las columnas coinciden. Puedes proceder con la carga.")
-                st.write("Vista previa de los datos:")
-                st.dataframe(df.head())
-
-            
-            if st.button("Cargar datos en la base"):
-                if esquema == "eventos_cartelera":
-                    df, log_df = normalizar_dataframe(df)
-                    st.info("Datos normalizados antes de cargar.")
-                    #st.dataframe(log_df)
-
-                progress_bar = st.progress(0)
-                total = len(df)
-
-                for i, fila in df.iterrows():
-                    valores_fila = fila[columnas_tabla].to_dict()
-                    if esquema == "categorias":
-                        cn.crear_registro3(slect_t, valores_fila)
-                    elif esquema == "informacion_ux":
-                        cn.crear_registro3_1(slect_t, valores_fila, esquema)
-                    elif esquema == "eventos_cartelera":
-                        cn.crear_registro3_1(slect_t, valores_fila, esquema)
-
-                    progress_bar.progress(int((i + 1) / total * 100))
-
-                progress_bar.empty()
-
-                st.success("Todos los registros fueron cargados correctamente.")
-
-
-def selec_compT(tabla,esquema):
-
-    if esquema=="categorias":
-        columnas = cn.obtener_campos3(tabla)
-        registros= cn.obtener_eventos3(tabla)
-    elif esquema=="preguntas_frecuentes":
-        columnas = cn.obtener_campos3_1(tabla,esquema)         
-        registros = cn.obtener_eventos3_1(tabla,esquema)       
-    elif esquema=="prompts_seguridad":
-        columnas = cn.obtener_campos3_1(tabla,esquema)        
-        registros = cn.obtener_eventos3_1(tabla,esquema)        
-   
-    else:
-        st.text("seleciona una base de datos valida")
-     
-   
-    df_compn = pd.DataFrame(registros, columns=columnas)
-    st.subheader("Registros")
-    st.dataframe(df_compn)
-
-
-def leerT(basedatos, esquema):
-       st.subheader(f"Leer registros de: {basedatos} ")
-
-       if esquema=="categorias":
-            diccionario_tablas = cn.obtener_tablas3()
-       elif esquema=="preguntas_frecuentes":
-           diccionario_tablas= cn.obtener_tablas3_1(esquema)
-       elif esquema=="prompts_seguridad":
-           diccionario_tablas=cn.obtener_tablas3_1(esquema)
-       
-       else:
-           st.text("seleciona una base de datos valida")
-
-       tablas = st.selectbox("Selecciona una tabla", options=list(diccionario_tablas.values()))
-       selec_compT(tablas,esquema)
-       edit_b = st.button("Editar")
-       if edit_b:
-            try:
-                 modificarT(tablas,esquema)
-            except Exception as e:
-                st.error(f"Ocurrió un error al editar el evento: {e}")
-
-@st.dialog("Modificar",width="large")
-def modificarT(t_elec,squema):
-    Opt_M =[" ","Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
-    if squema=="categorias":
-        opcionT = "Un registro"
-    elif squema=="preguntas_frecuentes":
-        opcionT = st.selectbox("Escoge una opción", options=["Un registro","Varios registros"])
-    elif squema=="prompts_seguridad":
-        opcionT = "Un registro"
-    else:
-        st.text("Esquema no valido")
-
-    st.text(f"esquema seleccionado: {squema}")
-    if opcionT == "Un registro":
-
-        campos = None
-        registro = None
-        id_seleccionado = None
-
-        if squema == "categorias":
-            campos = cn.obtener_campos3(t_elec)
-            ids = cn.editar_campo3(t_elec)
-            id_seleccionado = st.selectbox("Selecciona un ID", ids)
-            registro = cn.obtener_registro_id3(id_seleccionado, t_elec, campos)
-
-        elif squema == "preguntas_frecuentes":
-            campos = cn.obtener_campos3_1(t_elec, squema)
-            ids = cn.editar_campo3_1(t_elec, squema)
-            id_seleccionado = st.selectbox("Selecciona un ID", ids)
-            registro = cn.obtener_registro_id3_1(id_seleccionado, t_elec, campos, squema)
-
-        elif squema == "prompts_seguridad":
-            campos = cn.obtener_campos3_1(t_elec, squema)
-            ids = cn.editar_campo3_1(t_elec, squema)
-            id_seleccionado = st.selectbox("Selecciona un ID", ids)
-            registro = cn.obtener_registro_id3_1(id_seleccionado, t_elec, campos, squema)
-
-        else:
-            st.warning("Selecciona un esquema válido")
-
-        
-        if campos and registro:
-
-            col1, col2 = st.columns(2)
-            valores = {}
-            valor_idx = 0
-
-            for campo in campos:
-                with col1 if valor_idx % 2 == 0 else col2:
-                    valor_actual = registro[valor_idx]
-
-                    if "fecha" in campo.lower() or "dates" in campo.lower():
-                        valores[campo] = st.date_input(f"{campo}:", value=None)
-                    elif "month" in campo.lower():
-                        valores[campo] = st.selectbox(
-                            f"{campo}:",
-                            options=Opt_M,
-                            index=Opt_M.index(valor_actual) if valor_actual in Opt_M else 0
-                        )
-                    elif campo.lower() in {"descripcion", "respuesta", "pregunta"}:
-                        valores[campo] = st.text_area(f"{campo}:", value=valor_actual, height=100)
-                    else:
-                        valores[campo] = st.text_input(f"{campo}:", value=valor_actual)
-
-                valor_idx += 1
-
-            if st.button("Guardar cambios"):
-                if squema == "categorias":
-                    cn.actualizar_registro3(t_elec, id_seleccionado, valores)
-                    st.success("Registro actualizado correctamente")
-                    
-                elif squema=="preguntas_frecuentes":
-                    cn.actualizar_registro3_1(t_elec,id_seleccionado,valores,squema)
-                    st.success("Registro actualizado correctamente")
-
-                elif squema=="prompts_seguridad":
-                    cn.actualizar_registro3_1(t_elec,id_seleccionado,valores,squema)
-                    st.success("Registro actualizado correctamente")
-                
-                else:
-                    st.text("selecciona un esquema valido")
-    elif opcionT == "Varios registros":
-        if squema=="preguntas_frecuentes":
-            st.write(t_elec)
-
-            # 1. Obtener categorías
-            regop = cn.obtener_categorias3(t_elec,squema)
-            st.write("Categorías disponibles:", regop)
-
-            opciones = [r[0] for r in regop]
-
-            division = st.selectbox(
-                "Selecciona una categoría",
-                options=opciones
-            )
-
-            # 2. Obtener registros de esa categoría
-            registros = cn.obtener_registros_por_categoria3(t_elec, division,squema)
-
-            st.write(f"Registros en la categoría: {division}")
-
-            # 3. Mostrar tabla editable
-            if registros:
-                df = pd.DataFrame(
-                    registros,
-                    columns=["id", "title", "category", "pregunta", "respuesta"]
-                )
-
-                edited_df = st.data_editor(df, num_rows="dynamic")
-
-                # 4. Guardar cambios
-                if st.button("Guardar cambios"):
-                    for _, row in edited_df.iterrows():
-                        cn.actualizar_registro_cat_3(t_elec, row, squema)
-
-                    st.success("Registros actualizados correctamente ✅")
-            else:
-                st.warning("No se encontraron registros para esta categoría.")
-
-#        elif squema=="preguntas_frecuentes":
- #           campos =cn.obtener_campos3_1(t_elec,squema)
-#            st.write("Selecciona el campo a modificar")
-  #          ids = cn.editar_campo3_1(t_elec,squema)
-   #         id_seleccionado = st.selectbox("Selecciona un ID", ids)
-    #        registro= cn.obtener_registro_id3_1(id_seleccionado,t_elec,campos,squema)
-
-        elif squema=="prompts_seguridad":
-            campos =cn.obtener_campos3_1(t_elec,squema)
-            st.write("Selecciona el campo a modificar")
-            ids = cn.editar_campo3_1(t_elec,squema)
-            id_seleccionado = st.selectbox("Selecciona un ID", ids)
-            registro= cn.obtener_registro_id3_1(id_seleccionado,t_elec,campos,squema) 
-            
-        else:
-            st.text("seleciona una base de datos valida")
-    
-
-@st.dialog("Eliminar",width="large")    
-def eliminarT(esquema):
-    if esquema=="categorias":
-       D_tab= cn.obtener_tablas3()
-
-    elif esquema=="preguntas_frecuentes":
-       D_tab= cn.obtener_tablas3_1(esquema)
-
-
-    elif esquema=="prompts_seguridad":
-       D_tab= cn.obtener_tablas3_1(esquema)
-
-    else:
-        st.text("seleciona una base de datos valida")    
-   
-    t_selec = st.selectbox("Elige una tabla", options= list(D_tab.values()))
-    selec_compT(t_selec,esquema)
-
-    c1,c2 = st.columns([5,5])
-
-    if esquema=="categorias":
-      ids = cn.editar_campo3(t_selec)
-      campos= cn.obtener_campos3(t_selec)
-
-    elif esquema=="preguntas_frecuentes":
-      ids = cn.editar_campo3_1(t_selec,esquema)
-      campos= cn.obtener_campos3_1(t_selec,esquema)
-
-
-    elif esquema=="prompts_seguridad":
-      ids = cn.editar_campo3_1(t_selec,esquema)
-      campos= cn.obtener_campos3_1(t_selec,esquema)
-
-    else:
-        st.text("seleciona un esquema de datos valido")
-
-    with c1:
-         id_seleccionado = st.selectbox("Selecciona un ID", ids) 
-         
-         if esquema=="categorias":
-          registro=cn.obtener_registro_id3(id_seleccionado, t_selec,campos)
-         elif esquema=="preguntas_frecuentes":
-          registro=cn.obtener_registro_id3_1(id_seleccionado, t_selec,campos,esquema)
-         elif esquema=="prompts_seguridad":
-          registro=cn.obtener_registro_id3_1(id_seleccionado, t_selec,campos,esquema)
-
-    with c2:
-
-         if esquema=="categorias":
-          st.text(f"ID: {registro[0]}")
-          st.text(f"nombre: {registro[1]}")
-          st.text(f"descripcion: {registro[2]}")
-
-         elif esquema=="preguntas_frecuentes":
-
-          st.text(f"id: {registro[0]}")
-          st.text(f"Pregunta: {registro[3]}")
-          st.text(f"Respuesta: {registro[4]}")
-
-         elif esquema=="prompts_seguridad":
-
-          st.text(f"id: {registro[0]}")
-          st.text(f"contenido: {registro[1]}")
-          
-        
-    b_El = st.button("Eliminar registro")
-    if b_El:
-
-         if esquema=="categorias":
-          cn.eliminar_campo3(t_selec,id_seleccionado)
-          st.success("Registro eliminado exitosamente.") 
-
-
-         elif esquema=="preguntas_frecuentes":
-          cn.eliminar_campo3_1(t_selec,id_seleccionado,esquema)
-          st.success("Registro eliminado exitosamente.") 
-          
-        
-         elif esquema=="prompts_seguridad":
-          cn.eliminar_campo3_1(t_selec,id_seleccionado,esquema)
-          st.success("Registro eliminado exitosamente.") 
-        
-         else:
-             st.text("seleciona un esquema valido")
 
 menu_BD()
 
