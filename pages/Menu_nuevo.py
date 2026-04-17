@@ -135,6 +135,8 @@ def crear2():
                     valores[campo] = st.text_area(f"{campo}:", height=100, placeholder="Escribe aquí tu descripción:")
                 elif "hora" in campo.lower():
                     valores[campo] = st.time_input(f"{campo}:")
+                elif "prioridad" in campo.lower():
+                    valores[campo] = st.selectbox(f"{campo}:", options=["alta", "media", "baja"])
                 else:
                     valores[campo] = st.text_input(f"{campo}:")
             indice += 1

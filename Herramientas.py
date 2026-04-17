@@ -27,14 +27,14 @@ def MenuPrincipal():
             st.write("")
             st.page_link("pages/Pagina_Principal.py",label=" Página Principal",icon="🏠")
             st.page_link("pages/Menu_nuevo.py",label=" Componentes",icon="📝")
-            st.page_link("pages/Chatbot.py",label=" Gráficas",icon="📊")
+            st.page_link("pages/solicitudes.py",label=" Solicitudes",icon="📄")
             st.page_link("pages/MENU_BD.py",label= "TEST")
 
         elif st.session_state["rol"] in ["usuarioUX", "usuarioCl", "usuarioTU"]:
             st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🏠")
             st.page_link("pages/Menu_nuevo.py", label="Componentes", icon="📝")
             #st.page_link("pages/MENU_BD.py", label="TEST")
-            #st.page_link("pages/Chatbot.py", label="Gráficas", icon="📊")
+            #st.page_link("pages/solicitudes.py", label="Gráficas", icon="📊")
             #st.page_link("pages/log.py", label="login")
         else:
             st.page_link("pages/Pagina_Principal.py",label="Pagina Principal",icon="🏠")
